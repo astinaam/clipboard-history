@@ -1,0 +1,77 @@
+# Build directories
+build/
+build-*/
+*-build/
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.cmake
+
+# Qt generated files
+*.pro.user
+*.pro.user.*
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+*.qm
+*.ts
+
+# Compiled binaries
+clipboard-manager
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+
+# Object files
+*.o
+*.obj
+
+# Generated files
+*.desktop
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test results
+test_results.xml
+*.gcov
+*.gcda
+*.gcno
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Configuration override (keep template)
+*.json
+!resources/*.json.in
+
+# Package files
+*.deb
+*.rpm
+*.pkg
+*.dmg
+
+# Backup files
+*.bak
+*.backup
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

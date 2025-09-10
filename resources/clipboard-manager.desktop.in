@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Clipboard History Manager
+Comment=Lightweight clipboard history manager with global hotkey access
+Exec=clipboard-manager
+Icon=clipboard
+Terminal=false
+Type=Application
+Categories=Utility;
+StartupNotify=false
+Keywords=clipboard;history;paste;

@@ -1,0 +1,34 @@
+# Configuration for cmake-lint tool
+# Used to enforce CMake best practices
+
+[lint]
+# Maximum line length for CMake files
+line_length = 100
+
+# Disable specific checks that may not apply to our project
+disabled_codes = []
+
+# Enable all relevant checks
+tab_size = 4
+
+# Variable naming convention
+argument_var_pattern = "[a-z][a-z0-9_]*"
+keyword_var_pattern = "[A-Z][A-Z0-9_]*"
+internal_var_pattern = "_[a-z][a-z0-9_]*"
+
+# Function naming convention  
+function_pattern = "[a-z][a-z0-9_]*"
+macro_pattern = "[a-z][a-z0-9_]*"
+
+# Enable formatting checks
+enable_sort = true
+additional_commands = {
+    "qt6_add_executable": {
+        "pargs": {"nargs": "+", "flags": []},
+        "kwargs": {
+            "MANUAL_FINALIZATION": {"nargs": "*"},
+            "WIN32": {"nargs": "*"},
+            "MACOSX_BUNDLE": {"nargs": "*"}
+        }
+    }
+}
