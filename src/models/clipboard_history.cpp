@@ -1,6 +1,9 @@
 #include "clipboard_history.h"
 #include <QJsonDocument>
 #include <QDebug>
+#include <QFile>
+#include <QFileInfo>
+#include <QDir>
 #include <algorithm>
 
 ClipboardHistory::ClipboardHistory(QObject* parent)
@@ -349,4 +352,46 @@ QList<ClipboardItem>::iterator ClipboardHistory::findItemByHash(const QString& h
                        [&hash](const ClipboardItem& item) {
                            return item.hash() == hash;
                        });
+}
+
+QList<ClipboardItem>::const_iterator ClipboardHistory::findItemByHash(const QString& hash) const
+{
+    return std::find_if(m_items.begin(), m_items.end(), 
+                       [&hash](const ClipboardItem& item) {
+                           return item.hash() == hash;
+                       });
+}
+
+bool ClipboardHistory::loadFromFile(const QString& filePath)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return false;
+    }
+    
+    QByteArray data = file.readAll();
+    QJsonParseError error;
+    QJsonDocument doc = QJsonDocument::fromJson(data, &error);
+    
+    if (error.error != QJsonParseError::NoError || !doc.isObject()) {
+        return false;
+    }
+    
+    return fromJson(doc.object());
+}
+
+bool ClipboardHistory::saveToFile(const QString& filePath)
+{
+    QJsonObject obj = toJson();
+    QJsonDocument doc(obj);
+    
+    QFileInfo fileInfo(filePath);
+    QDir().mkpath(fileInfo.absolutePath());
+    
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly)) {
+        return false;
+    }
+    
+    return file.write(doc.toJson()) != -1;
 }

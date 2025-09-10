@@ -7,6 +7,7 @@
 
 // Include implemented headers
 #include "models/clipboard_item.h"
+#include "services/clipboard_manager.h"
 
 // Forward declarations for classes that don't exist yet
 // These will need to be implemented in Phase 3.3
@@ -96,9 +97,7 @@ void TestClipboardManager::cleanupTestCase()
 void TestClipboardManager::init()
 {
     // Create fresh manager instance for each test
-    // This will fail until ClipboardManager is implemented
-    // manager = new ClipboardManager(this);
-    manager = nullptr; // Placeholder until implementation exists
+    manager = new ClipboardManager(this);
 }
 
 void TestClipboardManager::cleanup()
@@ -110,21 +109,17 @@ void TestClipboardManager::cleanup()
 void TestClipboardManager::testConstruction()
 {
     // Test that ClipboardManager can be constructed
-    QSKIP("ClipboardManager not implemented yet - this test MUST fail until T015 is complete");
-    
-    // Uncomment once ClipboardManager exists:
-    // ClipboardManager testManager(this);
-    // QVERIFY(&testManager != nullptr);
+    ClipboardManager testManager(this);
+    QVERIFY(&testManager != nullptr);
 }
 
 void TestClipboardManager::testDestruction()
 {
     // Test that ClipboardManager can be properly destroyed
-    QSKIP("ClipboardManager not implemented yet - this test MUST fail until T015 is complete");
-    
-    // Uncomment once ClipboardManager exists:
-    // ClipboardManager* testManager = new ClipboardManager(this);
-    // delete testManager; // Should not crash
+    ClipboardManager* testManager = new ClipboardManager(this);
+    QVERIFY(testManager != nullptr);
+    delete testManager;
+    // If we get here without crashing, destruction worked
 }
 
 void TestClipboardManager::testSetMaxHistoryItems_validRange()

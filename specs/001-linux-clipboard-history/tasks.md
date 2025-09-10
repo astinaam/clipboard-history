@@ -104,9 +104,14 @@ Task: "Integration test system tray in tests/integration/test_tray_integration.c
 Task: "Integration test persistence in tests/integration/test_persistence_integration.cpp"
 
 # Launch T012-T014 together (model classes):
-Task: "ClipboardItem model class in src/models/clipboard_item.cpp"
-Task: "ClipboardHistory model class in src/models/clipboard_history.cpp"
-Task: "Configuration model class in src/models/configuration.cpp"
+✅ Task: "ClipboardItem model class in src/models/clipboard_item.cpp"
+✅ Task: "ClipboardHistory model class in src/models/clipboard_history.cpp"  
+✅ Task: "Configuration model class in src/models/configuration.cpp"
+
+# Launch T015-T017 together (service classes):
+✅ Task: "ClipboardManager service class in src/services/clipboard_manager.cpp"
+Task: "ClipboardWindow service class in src/services/clipboard_window.cpp"
+Task: "TrayIcon service class in src/services/tray_icon.cpp"
 ```
 
 ## Notes

@@ -172,6 +172,20 @@ public:
      * @return true if loading was successful
      */
     bool fromJson(const QJsonObject& json);
+    
+    /**
+     * @brief Load history from file
+     * @param filePath Path to load from
+     * @return true if loading was successful
+     */
+    bool loadFromFile(const QString& filePath);
+    
+    /**
+     * @brief Save history to file
+     * @param filePath Path to save to
+     * @return true if saving was successful
+     */
+    bool saveToFile(const QString& filePath);
 
 signals:
     /**
@@ -250,6 +264,13 @@ private:
      * @return Iterator to the item, or end() if not found
      */
     QList<ClipboardItem>::iterator findItemByHash(const QString& hash);
+    
+    /**
+     * @brief Find item by content hash (const version)
+     * @param hash Content hash to find
+     * @return Const iterator to the item, or end() if not found
+     */
+    QList<ClipboardItem>::const_iterator findItemByHash(const QString& hash) const;
 
     static constexpr int DEFAULT_MAX_ITEMS = 50;
     static constexpr int MIN_MAX_ITEMS = 10;
