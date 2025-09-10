@@ -47,14 +47,14 @@
 
 ## Phase 3.2: Tests First (TDD) ⚠️ MUST COMPLETE BEFORE 3.3
 **CRITICAL: These tests MUST be written and MUST FAIL before ANY implementation**
-- [ ] T004 [P] Contract test ClipboardManager API in tests/contract/test_clipboard_manager.cpp
-- [ ] T005 [P] Contract test ClipboardWindow API in tests/contract/test_clipboard_window.cpp
-- [ ] T006 [P] Contract test TrayIcon API in tests/contract/test_tray_icon.cpp
-- [ ] T007 [P] Integration test clipboard monitoring workflow in tests/integration/test_clipboard_monitoring.cpp
-- [ ] T008 [P] Integration test Meta+V hotkey popup in tests/integration/test_global_hotkey.cpp
-- [ ] T009 [P] Integration test item pinning workflow in tests/integration/test_item_pinning.cpp
-- [ ] T010 [P] Integration test system tray interaction in tests/integration/test_system_tray.cpp
-- [ ] T011 [P] Integration test history persistence in tests/integration/test_persistence.cpp
+- [x] T004 [P] Contract test ClipboardManager API in tests/contract/test_clipboard_manager.cpp
+- [x] T005 [P] Contract test ClipboardWindow API in tests/contract/test_clipboard_window.cpp
+- [x] T006 [P] Contract test TrayIcon API in tests/contract/test_tray_icon.cpp
+- [x] T007 [P] Integration test clipboard monitoring workflow in tests/integration/test_clipboard_monitoring.cpp
+- [x] T008 [P] Integration test Meta+V hotkey popup in tests/integration/test_hotkey_interaction.cpp
+- [x] T009 [P] Integration test item pinning workflow in tests/integration/test_pinning_workflow.cpp
+- [x] T010 [P] Integration test system tray interaction in tests/integration/test_tray_integration.cpp
+- [x] T011 [P] Integration test history persistence in tests/integration/test_persistence_integration.cpp
 
 ## Phase 3.3: Core Implementation (ONLY after tests are failing)
 - [ ] T012 [P] ClipboardItem model class in src/models/clipboard_item.cpp
@@ -98,10 +98,10 @@ Task: "Contract test TrayIcon API in tests/contract/test_tray_icon.cpp"
 
 # Launch T007-T011 together (integration tests):
 Task: "Integration test clipboard monitoring in tests/integration/test_clipboard_monitoring.cpp"
-Task: "Integration test Meta+V hotkey in tests/integration/test_global_hotkey.cpp"
-Task: "Integration test item pinning in tests/integration/test_item_pinning.cpp"
-Task: "Integration test system tray in tests/integration/test_system_tray.cpp"
-Task: "Integration test persistence in tests/integration/test_persistence.cpp"
+Task: "Integration test Meta+V hotkey in tests/integration/test_hotkey_interaction.cpp"
+Task: "Integration test item pinning in tests/integration/test_pinning_workflow.cpp"
+Task: "Integration test system tray in tests/integration/test_tray_integration.cpp"
+Task: "Integration test persistence in tests/integration/test_persistence_integration.cpp"
 
 # Launch T012-T014 together (model classes):
 Task: "ClipboardItem model class in src/models/clipboard_item.cpp"
