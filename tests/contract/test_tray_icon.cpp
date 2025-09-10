@@ -8,14 +8,15 @@
 #include <QElapsedTimer>
 #include <QApplication>
 
+// Include implemented headers
+#include "models/clipboard_item.h"
+
 // Forward declarations for classes that don't exist yet
 // These will need to be implemented in Phase 3.3
 class TrayIcon;
-struct ClipboardItem;
 
 // Include headers once they exist
 // #include "ui/tray_icon.h"
-// #include "models/clipboard_item.h"
 
 class TestTrayIcon : public QObject
 {
@@ -595,18 +596,12 @@ void TestTrayIcon::testNotificationSupport()
 
 ClipboardItem TestTrayIcon::createTestItem(const QString& text, bool pinned)
 {
-    // This will fail until ClipboardItem is implemented
-    // ClipboardItem item;
-    // item.id = QUuid::createUuid().toString();
-    // item.text = text;
-    // item.preview = text.left(50); // 50 char limit for tray menu
-    // item.timestamp = QDateTime::currentDateTime();
-    // item.pinned = pinned;
-    // item.hash = QString::number(qHash(text));
-    // return item;
-    
-    // Placeholder until ClipboardItem exists
-    return ClipboardItem{}; // This will fail compilation
+    // Now we can create a real ClipboardItem
+    ClipboardItem item(text);
+    if (pinned) {
+        item.pin();
+    }
+    return item;
 }
 
 QList<ClipboardItem> TestTrayIcon::createTestHistory(int count)

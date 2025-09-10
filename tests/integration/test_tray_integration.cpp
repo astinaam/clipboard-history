@@ -8,12 +8,14 @@
 #include <QAction>
 #include <QElapsedTimer>
 
+// Include implemented headers
+#include "models/clipboard_item.h"
+
 // Forward declarations for classes that don't exist yet
 // These will need to be implemented in Phase 3.3
 class TrayIcon;
 class ClipboardManager;
 class ClipboardWindow;
-struct ClipboardItem;
 
 // Include headers once they exist
 // #include "ui/tray_icon.h"

@@ -7,16 +7,17 @@
 #include <QElapsedTimer>
 #include <QClipboard>
 
+// Include implemented headers
+#include "models/clipboard_item.h"
+
 // Forward declarations for classes that don't exist yet
 // These will need to be implemented in Phase 3.3
 class ClipboardWindow;
 class ClipboardManager;
-struct ClipboardItem;
 
 // Include headers once they exist
 // #include "ui/clipboard_window.h"
 // #include "services/clipboard_manager.h"
-// #include "models/clipboard_item.h"
 
 class TestHotkeyInteraction : public QObject
 {

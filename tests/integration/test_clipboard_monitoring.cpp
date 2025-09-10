@@ -7,14 +7,15 @@
 #include <QElapsedTimer>
 #include <QMimeData>
 
+// Include implemented headers
+#include "models/clipboard_item.h"
+
 // Forward declarations for classes that don't exist yet
 // These will need to be implemented in Phase 3.3
 class ClipboardManager;
-struct ClipboardItem;
 
 // Include headers once they exist
 // #include "services/clipboard_manager.h"
-// #include "models/clipboard_item.h"
 
 class TestClipboardMonitoring : public QObject
 {
@@ -717,9 +718,9 @@ void TestClipboardMonitoring::setClipboardUrls(const QList<QUrl>& urls)
 
 ClipboardItem TestClipboardMonitoring::getLastHistoryItem()
 {
-    // This will fail until ClipboardManager and ClipboardItem are implemented
+    // This will fail until ClipboardManager is implemented
     // return manager->getHistory().first();
-    return ClipboardItem{}; // Placeholder
+    return ClipboardItem(); // Return invalid item until manager exists
 }
 
 void TestClipboardMonitoring::waitForClipboardChange()

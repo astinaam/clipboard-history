@@ -11,10 +11,12 @@
 #include <QApplication>
 #include <QElapsedTimer>
 
+// Include implemented headers
+#include "models/clipboard_item.h"
+
 // Forward declarations for classes that don't exist yet
 // These will need to be implemented in Phase 3.3
 class ClipboardWindow;
-struct ClipboardItem;
 
 // Include headers once they exist
 // #include "ui/clipboard_window.h"
@@ -655,18 +657,12 @@ void TestClipboardWindow::testScrollingPerformance()
 
 ClipboardItem TestClipboardWindow::createTestItem(const QString& text, bool pinned)
 {
-    // This will fail until ClipboardItem is implemented
-    // ClipboardItem item;
-    // item.id = QUuid::createUuid().toString();
-    // item.text = text;
-    // item.preview = text.left(100);
-    // item.timestamp = QDateTime::currentDateTime();
-    // item.pinned = pinned;
-    // item.hash = QString::number(qHash(text));
-    // return item;
-    
-    // Placeholder until ClipboardItem exists
-    return ClipboardItem{}; // This will fail compilation
+    // Now we can create a real ClipboardItem
+    ClipboardItem item(text);
+    if (pinned) {
+        item.pin();
+    }
+    return item;
 }
 
 QList<ClipboardItem> TestClipboardWindow::createTestHistory(int count)
@@ -680,12 +676,16 @@ QList<ClipboardItem> TestClipboardWindow::createTestHistory(int count)
 
 void TestClipboardWindow::simulateMouseClick(const QPoint& position)
 {
-    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, position);
+    // Can't test mouse clicks until ClipboardWindow is implemented
+    Q_UNUSED(position)
+    // QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, position);
 }
 
 void TestClipboardWindow::simulateKeyPress(int key)
 {
-    QTest::keyPress(window, key);
+    // Can't test key presses until ClipboardWindow is implemented  
+    Q_UNUSED(key)
+    // QTest::keyPress(window, key);
 }
 
 QTEST_MAIN(TestClipboardWindow)

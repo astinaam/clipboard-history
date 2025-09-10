@@ -5,14 +5,15 @@
 #include <QJsonObject>
 #include <QDateTime>
 
+// Include implemented headers
+#include "models/clipboard_item.h"
+
 // Forward declarations for classes that don't exist yet
 // These will need to be implemented in Phase 3.3
 class ClipboardManager;
-struct ClipboardItem;
 
 // Include headers once they exist
 // #include "services/clipboard_manager.h"
-// #include "models/clipboard_item.h"
 
 class TestClipboardManager : public QObject
 {
@@ -72,7 +73,7 @@ private slots:
 private:
     ClipboardManager* manager;
     QTemporaryDir* tempDir;
-    QString testConfigPath;
+    QString configPath;
     
     // Helper methods
     ClipboardItem createTestItem(const QString& text, bool pinned = false);
@@ -84,7 +85,7 @@ void TestClipboardManager::initTestCase()
     // Set up test environment
     tempDir = new QTemporaryDir();
     QVERIFY(tempDir->isValid());
-    testConfigPath = tempDir->path() + "/test_config.json";
+    configPath = tempDir->path() + "/test_config.json";
 }
 
 void TestClipboardManager::cleanupTestCase()
@@ -484,18 +485,12 @@ void TestClipboardManager::testProcessingPerformance()
 
 ClipboardItem TestClipboardManager::createTestItem(const QString& text, bool pinned)
 {
-    // This will fail until ClipboardItem is implemented
-    // ClipboardItem item;
-    // item.id = QUuid::createUuid().toString();
-    // item.text = text;
-    // item.preview = text.left(100);
-    // item.timestamp = QDateTime::currentDateTime();
-    // item.pinned = pinned;
-    // item.hash = QString::number(qHash(text));
-    // return item;
-    
-    // Placeholder until ClipboardItem exists
-    return ClipboardItem{}; // This will fail compilation
+    // Now we can create a real ClipboardItem
+    ClipboardItem item(text);
+    if (pinned) {
+        item.pin();
+    }
+    return item;
 }
 
 void TestClipboardManager::addTestItems(int count)

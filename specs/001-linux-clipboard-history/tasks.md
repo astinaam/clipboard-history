@@ -57,9 +57,9 @@
 - [x] T011 [P] Integration test history persistence in tests/integration/test_persistence_integration.cpp
 
 ## Phase 3.3: Core Implementation (ONLY after tests are failing)
-- [ ] T012 [P] ClipboardItem model class in src/models/clipboard_item.cpp
-- [ ] T013 [P] ClipboardHistory model class in src/models/clipboard_history.cpp
-- [ ] T014 [P] Configuration model class in src/models/configuration.cpp
+- [x] T012 [P] ClipboardItem model class in src/models/clipboard_item.cpp
+- [x] T013 [P] ClipboardHistory model class in src/models/clipboard_history.cpp
+- [x] T014 [P] Configuration model class in src/models/configuration.cpp
 - [ ] T015 ClipboardManager library implementation in src/services/clipboard_manager.cpp
 - [ ] T016 ClipboardWindow library implementation in src/ui/clipboard_window.cpp
 - [ ] T017 TrayIcon library implementation in src/ui/tray_icon.cpp
