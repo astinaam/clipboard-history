@@ -11,16 +11,8 @@
 #include <QApplication>
 #include <QElapsedTimer>
 
-// Include implemented headers
-#include "models/clipboard_item.h"
-
-// Forward declarations for classes that don't exist yet
-// These will need to be implemented in Phase 3.3
-class ClipboardWindow;
-
-// Include headers once they exist
-// #include "ui/clipboard_window.h"
-// #include "models/clipboard_item.h"
+#include "../../src/models/clipboard_item.h"
+#include "../../src/ui/clipboard_window.h"
 
 class TestClipboardWindow : public QObject
 {
@@ -120,9 +112,7 @@ void TestClipboardWindow::cleanupTestCase()
 void TestClipboardWindow::init()
 {
     // Create fresh window instance for each test
-    // This will fail until ClipboardWindow is implemented
-    // window = new ClipboardWindow();
-    window = nullptr; // Placeholder until implementation exists
+    window = new ClipboardWindow();
     
     // Create test data
     testItems = createTestHistory(5);

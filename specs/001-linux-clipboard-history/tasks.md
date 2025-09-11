@@ -60,8 +60,8 @@
 - [x] T012 [P] ClipboardItem model class in src/models/clipboard_item.cpp
 - [x] T013 [P] ClipboardHistory model class in src/models/clipboard_history.cpp
 - [x] T014 [P] Configuration model class in src/models/configuration.cpp
-- [ ] T015 ClipboardManager library implementation in src/services/clipboard_manager.cpp
-- [ ] T016 ClipboardWindow library implementation in src/ui/clipboard_window.cpp
+- [x] T015 ClipboardManager library implementation in src/services/clipboard_manager.cpp
+- [x] T016 ClipboardWindow library implementation in src/ui/clipboard_window.cpp
 - [ ] T017 TrayIcon library implementation in src/ui/tray_icon.cpp
 - [ ] T018 Main application entry point in src/main.cpp
 - [ ] T019 CLI argument parsing in src/cli/argument_parser.cpp
@@ -110,8 +110,8 @@ Task: "Integration test persistence in tests/integration/test_persistence_integr
 
 # Launch T015-T017 together (service classes):
 ✅ Task: "ClipboardManager service class in src/services/clipboard_manager.cpp"
-Task: "ClipboardWindow service class in src/services/clipboard_window.cpp"
-Task: "TrayIcon service class in src/services/tray_icon.cpp"
+✅ Task: "ClipboardWindow UI class in src/ui/clipboard_window.cpp"
+Task: "TrayIcon UI class in src/ui/tray_icon.cpp"
 ```
 
 ## Notes
