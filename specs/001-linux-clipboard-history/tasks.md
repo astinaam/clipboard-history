@@ -68,7 +68,7 @@
 - [x] T020 Global hotkey registration (X11/Wayland) in src/lib/global_hotkey.cpp
 
 ## Phase 3.4: Integration
-- [ ] T021 Connect ClipboardManager to QClipboard monitoring
+- [x] T021 Connect ClipboardManager to QClipboard monitoring
 - [ ] T022 Wire ClipboardWindow to ClipboardManager signals
 - [ ] T023 Integrate TrayIcon with system tray and menu actions
 - [ ] T024 JSON persistence for configuration and history

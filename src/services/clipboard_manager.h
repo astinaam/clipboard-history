@@ -151,6 +151,12 @@ signals:
     void itemRemoved(const QString& id);
     
     /**
+     * Emitted when monitoring state changes
+     * @param monitoring true if monitoring started, false if stopped
+     */
+    void monitoringStateChanged(bool monitoring);
+    
+    /**
      * Emitted when error occurs (invalid config, file I/O failure, etc.)
      * @param message Human-readable error description
      */

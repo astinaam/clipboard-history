@@ -163,6 +163,7 @@ void ClipboardManager::startMonitoring()
             this, &ClipboardManager::onClipboardChanged);
     
     m_monitoring = true;
+    emit monitoringStateChanged(true);
 }
 
 void ClipboardManager::stopMonitoring()
@@ -175,6 +176,7 @@ void ClipboardManager::stopMonitoring()
                this, &ClipboardManager::onClipboardChanged);
     
     m_monitoring = false;
+    emit monitoringStateChanged(false);
 }
 
 bool ClipboardManager::isMonitoring() const

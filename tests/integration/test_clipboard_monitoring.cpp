@@ -7,15 +7,13 @@
 #include <QElapsedTimer>
 #include <QMimeData>
 
-// Include implemented headers
-#include "models/clipboard_item.h"
+#include <QMimeData>
 
-// Forward declarations for classes that don't exist yet
-// These will need to be implemented in Phase 3.3
-class ClipboardManager;
+// Include implemented headers
+#include "../../src/models/clipboard_item.h"
 
 // Include headers once they exist
-// #include "services/clipboard_manager.h"
+#include "../../src/services/clipboard_manager.h"
 
 class TestClipboardMonitoring : public QObject
 {
@@ -106,9 +104,7 @@ void TestClipboardMonitoring::cleanupTestCase()
 void TestClipboardMonitoring::init()
 {
     // Create fresh manager instance for each test
-    // This will fail until ClipboardManager is implemented
-    // manager = new ClipboardManager(this);
-    manager = nullptr; // Placeholder until implementation exists
+    manager = new ClipboardManager(this);
     
     capturedItems.clear();
     
@@ -119,7 +115,7 @@ void TestClipboardMonitoring::init()
 void TestClipboardMonitoring::cleanup()
 {
     if (manager) {
-        // manager->stopMonitoring();
+        manager->stopMonitoring();
     }
     delete manager;
     manager = nullptr;
@@ -131,53 +127,44 @@ void TestClipboardMonitoring::cleanup()
 void TestClipboardMonitoring::testStartMonitoring()
 {
     // Integration Test: Manager should start monitoring clipboard changes
-    QSKIP("ClipboardManager not implemented yet - this test MUST fail until T012 is complete");
+    QVERIFY(!manager->isMonitoring());
     
-    // Uncomment once ClipboardManager exists:
-    // QVERIFY(!manager->isMonitoring());
-    // 
-    // QSignalSpy stateSpy(manager, &ClipboardManager::monitoringStateChanged);
-    // manager->startMonitoring();
-    // 
-    // QVERIFY(manager->isMonitoring());
-    // QCOMPARE(stateSpy.count(), 1);
-    // QCOMPARE(stateSpy.at(0).at(0).toBool(), true);
+    QSignalSpy stateSpy(manager, &ClipboardManager::monitoringStateChanged);
+    manager->startMonitoring();
+    
+    QVERIFY(manager->isMonitoring());
+    QCOMPARE(stateSpy.count(), 1);
+    QCOMPARE(stateSpy.at(0).at(0).toBool(), true);
 }
 
 void TestClipboardMonitoring::testStopMonitoring()
 {
     // Integration Test: Manager should stop monitoring and ignore changes
-    QSKIP("ClipboardManager not implemented yet - this test MUST fail until T012 is complete");
+    manager->startMonitoring();
+    QVERIFY(manager->isMonitoring());
     
-    // Uncomment once ClipboardManager exists:
-    // manager->startMonitoring();
-    // QVERIFY(manager->isMonitoring());
-    // 
-    // QSignalSpy stateSpy(manager, &ClipboardManager::monitoringStateChanged);
-    // manager->stopMonitoring();
-    // 
-    // QVERIFY(!manager->isMonitoring());
-    // QCOMPARE(stateSpy.count(), 1);
-    // QCOMPARE(stateSpy.at(0).at(0).toBool(), false);
-    // 
-    // // Test that changes are ignored when stopped
-    // int initialCount = manager->getHistory().count();
-    // setClipboardText("Should be ignored");
-    // waitForClipboardChange();
-    // QCOMPARE(manager->getHistory().count(), initialCount);
+    QSignalSpy stateSpy(manager, &ClipboardManager::monitoringStateChanged);
+    manager->stopMonitoring();
+    
+    QVERIFY(!manager->isMonitoring());
+    QCOMPARE(stateSpy.count(), 1);
+    QCOMPARE(stateSpy.at(0).at(0).toBool(), false);
+    
+    // Test that changes are ignored when stopped
+    int initialCount = manager->getHistory().count();
+    setClipboardText("Should be ignored");
+    waitForClipboardChange();
+    QCOMPARE(manager->getHistory().count(), initialCount);
 }
 
 void TestClipboardMonitoring::testRestartMonitoring()
 {
     // Integration Test: Manager should handle start/stop cycles gracefully
-    QSKIP("ClipboardManager not implemented yet - this test MUST fail until T012 is complete");
-    
-    // Uncomment once ClipboardManager exists:
-    // // Start -> Stop -> Start cycle
-    // manager->startMonitoring();
-    // manager->stopMonitoring();
-    // manager->startMonitoring();
-    // QVERIFY(manager->isMonitoring());
+    // Start -> Stop -> Start cycle
+    manager->startMonitoring();
+    manager->stopMonitoring();
+    manager->startMonitoring();
+    QVERIFY(manager->isMonitoring());
     // 
     // // Verify monitoring still works after restart
     // QSignalSpy spy(manager, &ClipboardManager::itemAdded);
@@ -189,19 +176,16 @@ void TestClipboardMonitoring::testRestartMonitoring()
 void TestClipboardMonitoring::testMonitoringStateSignals()
 {
     // Integration Test: State change signals should work correctly
-    QSKIP("ClipboardManager not implemented yet - this test MUST fail until T012 is complete");
+    QSignalSpy spy(manager, &ClipboardManager::monitoringStateChanged);
     
-    // Uncomment once ClipboardManager exists:
-    // QSignalSpy spy(manager, &ClipboardManager::monitoringStateChanged);
-    // 
-    // manager->startMonitoring();
-    // manager->stopMonitoring();
-    // manager->startMonitoring();
-    // 
-    // QCOMPARE(spy.count(), 3);
-    // QCOMPARE(spy.at(0).at(0).toBool(), true);  // Started
-    // QCOMPARE(spy.at(1).at(0).toBool(), false); // Stopped
-    // QCOMPARE(spy.at(2).at(0).toBool(), true);  // Restarted
+    manager->startMonitoring();
+    manager->stopMonitoring();
+    manager->startMonitoring();
+    
+    QCOMPARE(spy.count(), 3);
+    QCOMPARE(spy.at(0).at(0).toBool(), true);  // Started
+    QCOMPARE(spy.at(1).at(0).toBool(), false); // Stopped
+    QCOMPARE(spy.at(2).at(0).toBool(), true);  // Restarted
 }
 
 void TestClipboardMonitoring::testTextChangeDetection()
@@ -718,9 +702,11 @@ void TestClipboardMonitoring::setClipboardUrls(const QList<QUrl>& urls)
 
 ClipboardItem TestClipboardMonitoring::getLastHistoryItem()
 {
-    // This will fail until ClipboardManager is implemented
-    // return manager->getHistory().first();
-    return ClipboardItem(); // Return invalid item until manager exists
+    auto history = manager->getHistory();
+    if (!history.isEmpty()) {
+        return history.first();
+    }
+    return ClipboardItem(); // Return invalid item if history is empty
 }
 
 void TestClipboardMonitoring::waitForClipboardChange()
