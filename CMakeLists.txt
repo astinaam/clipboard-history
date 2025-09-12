@@ -97,7 +97,7 @@ set(POTENTIAL_TEST_FILES
     tests/integration/test_global_hotkey.cpp
     tests/integration/test_item_pinning.cpp
     tests/integration/test_system_tray.cpp
-    tests/integration/test_persistence.cpp
+    tests/integration/test_persistence_integration.cpp
     tests/unit/test_clipboard_item.cpp
     tests/performance/test_performance.cpp
 )

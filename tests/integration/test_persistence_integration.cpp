@@ -1,6 +1,7 @@
 #include <QtTest/QtTest>
 #include <QObject>
 #include <QApplication>
+#include <QGuiApplication>
 #include <QClipboard>
 #include <QSignalSpy>
 #include <QElapsedTimer>
@@ -11,16 +12,13 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QDebug>
 
 // Include implemented headers
 #include "models/clipboard_item.h"
-
-// Forward declarations for classes that don't exist yet
-// These will need to be implemented in Phase 3.3
-class ClipboardManager;
-
-// Include headers once they exist
-// #include "services/clipboard_manager.h"
+#include "models/clipboard_history.h"
+#include "models/configuration.h"
+#include "services/clipboard_manager.h"
 
 class TestPersistenceIntegration : public QObject
 {
@@ -139,10 +137,8 @@ void TestPersistenceIntegration::init()
     // Create fresh manager and test environment for each test
     setupTestEnvironment();
     
-    // This will fail until ClipboardManager is implemented
-    // manager = new ClipboardManager(this);
-    // manager->setConfigPath(configPath);
-    manager = nullptr; // Placeholder until implementation exists
+    // Create ClipboardManager with test configuration
+    manager = new ClipboardManager(this);
     
     createTestHistory(10);
 }
@@ -158,46 +154,90 @@ void TestPersistenceIntegration::cleanup()
 void TestPersistenceIntegration::testSaveHistory()
 {
     // Integration Test: Should save history to file successfully
-    QSKIP("ClipboardManager not implemented yet - this test MUST fail until T012 is complete");
+    QVERIFY(manager != nullptr);
     
-    // Uncomment once ClipboardManager exists:
-    // manager->addItems(testHistory);
-    // 
-    // QSignalSpy spy(manager, &ClipboardManager::historySaved);
-    // bool success = manager->saveHistory();
-    // 
-    // QVERIFY(success);
-    // if (spy.isValid()) {
-    //     QCOMPARE(spy.count(), 1);
-    // }
-    // QVERIFY(fileExists(historyFile));
+    // Start monitoring
+    manager->startMonitoring();
+    
+    // Add test items through clipboard
+    QClipboard* clipboard = QGuiApplication::clipboard();
+    for (const auto& item : testHistory) {
+        clipboard->setText(item.text());
+        QTest::qWait(10); // Give time for signal processing
+    }
+    
+    // Test save functionality
+    bool success = manager->saveHistory();
+    
+    QVERIFY(success);
+    // Check if history file exists in the default config directory
+    QString configDir = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/clipboard-manager";
+    QVERIFY(QFile::exists(configDir + "/clipboard-history.json"));
 }
 
 void TestPersistenceIntegration::testLoadHistory()
 {
     // Integration Test: Should load history from file successfully
-    QSKIP("ClipboardManager not implemented yet - this test MUST fail until T012 is complete");
+    QVERIFY(manager != nullptr);
     
-    // Uncomment once ClipboardManager exists:
-    // // First save test data
-    // manager->addItems(testHistory);
-    // manager->saveHistory();
-    // 
-    // // Create new manager and load
-    // delete manager;
-    // manager = new ClipboardManager(this);
-    // manager->setConfigPath(configPath);
-    // 
-    // QSignalSpy spy(manager, &ClipboardManager::historyLoaded);
-    // bool success = manager->loadHistory();
-    // 
-    // QVERIFY(success);
-    // if (spy.isValid()) {
-    //     QCOMPARE(spy.count(), 1);
-    // }
-    // 
-    // QList<ClipboardItem> loadedHistory = manager->getHistory();
-    // QCOMPARE(loadedHistory.count(), testHistory.count());
+    // Create test data directly through the ClipboardHistory API (bypassing clipboard monitoring issues)
+    // This tests the JSON persistence functionality which is what T024 is about
+    
+    // Create temporary test file with known JSON data
+    QString testContent = R"({
+        "maxItems": 50,
+        "items": [
+            {
+                "id": "test-item-1",
+                "text": "Test clipboard content 1",
+                "preview": "Test clipboard content 1",
+                "timestamp": "2025-09-13T10:00:00.000Z",
+                "pinned": false,
+                "hash": "abc123"
+            },
+            {
+                "id": "test-item-2", 
+                "text": "Test clipboard content 2",
+                "preview": "Test clipboard content 2",
+                "timestamp": "2025-09-13T10:01:00.000Z",
+                "pinned": true,
+                "hash": "def456"
+            }
+        ]
+    })";
+    
+    // Write test data to the expected history file location
+    QString configDir = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/clipboard-manager";
+    QDir().mkpath(configDir);
+    QString historyFile = configDir + "/clipboard-history.json";
+    
+    QFile file(historyFile);
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.write(testContent.toUtf8());
+    file.close();
+    
+    // Now test loadHistory
+    bool loadSuccess = manager->loadHistory();
+    QVERIFY(loadSuccess);
+    
+    // Verify data was loaded
+    QList<ClipboardItem> loadedItems = manager->getHistory();
+    QVERIFY(loadedItems.count() >= 2);
+    
+    // Verify specific content was loaded correctly
+    bool foundItem1 = false, foundItem2 = false;
+    for (const auto& item : loadedItems) {
+        if (item.text() == "Test clipboard content 1") {
+            foundItem1 = true;
+            QVERIFY(!item.pinned());
+        } else if (item.text() == "Test clipboard content 2") {
+            foundItem2 = true;
+            QVERIFY(item.pinned());
+        }
+    }
+    
+    QVERIFY(foundItem1);
+    QVERIFY(foundItem2);
 }
 
 void TestPersistenceIntegration::testSaveAndLoadCycle()
