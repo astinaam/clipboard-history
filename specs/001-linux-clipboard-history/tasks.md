@@ -64,8 +64,8 @@
 - [x] T016 ClipboardWindow library implementation in src/ui/clipboard_window.cpp
 - [x] T017 TrayIcon library implementation in src/ui/tray_icon.cpp
 - [x] T018 Main application entry point in src/main.cpp
-- [ ] T019 CLI argument parsing in src/cli/argument_parser.cpp
-- [ ] T020 Global hotkey registration (X11/Wayland) in src/lib/global_hotkey.cpp
+- [x] T019 CLI argument parsing in src/cli/argument_parser.cpp
+- [x] T020 Global hotkey registration (X11/Wayland) in src/lib/global_hotkey.cpp
 
 ## Phase 3.4: Integration
 - [ ] T021 Connect ClipboardManager to QClipboard monitoring

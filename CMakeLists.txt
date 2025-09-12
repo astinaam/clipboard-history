@@ -92,6 +92,7 @@ set(POTENTIAL_TEST_FILES
     tests/contract/test_clipboard_window.cpp
     tests/contract/test_tray_icon.cpp
     tests/contract/test_argument_parser.cpp
+    tests/contract/test_global_hotkey.cpp
     tests/integration/test_clipboard_monitoring.cpp
     tests/integration/test_global_hotkey.cpp
     tests/integration/test_item_pinning.cpp
