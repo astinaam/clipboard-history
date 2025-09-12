@@ -50,9 +50,13 @@ endfunction()
 # Collect all source files
 collect_sources(src SOURCES HEADERS)
 
+# Separate library sources from main.cpp
+set(LIB_SOURCES ${SOURCES})
+list(REMOVE_ITEM LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
+
 # Only create main executable if main.cpp exists
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
-    add_executable(clipboard-manager ${SOURCES} ${HEADERS})
+    add_executable(clipboard-manager src/main.cpp ${LIB_SOURCES} ${HEADERS})
     target_link_libraries(clipboard-manager Qt6::Core Qt6::Widgets Qt6::Gui)
     
     if(X11_FOUND)
@@ -69,7 +73,7 @@ enable_testing()
 function(create_test_executable test_file)
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${test_file}")
         get_filename_component(test_name ${test_file} NAME_WE)
-        add_executable(${test_name} ${test_file} ${SOURCES})
+        add_executable(${test_name} ${test_file} ${LIB_SOURCES})
         target_link_libraries(${test_name} Qt6::Test Qt6::Core Qt6::Widgets Qt6::Gui)
         
         if(X11_FOUND)
@@ -87,6 +91,7 @@ set(POTENTIAL_TEST_FILES
     tests/contract/test_clipboard_manager.cpp
     tests/contract/test_clipboard_window.cpp
     tests/contract/test_tray_icon.cpp
+    tests/contract/test_argument_parser.cpp
     tests/integration/test_clipboard_monitoring.cpp
     tests/integration/test_global_hotkey.cpp
     tests/integration/test_item_pinning.cpp

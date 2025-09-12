@@ -62,8 +62,8 @@
 - [x] T014 [P] Configuration model class in src/models/configuration.cpp
 - [x] T015 ClipboardManager library implementation in src/services/clipboard_manager.cpp
 - [x] T016 ClipboardWindow library implementation in src/ui/clipboard_window.cpp
-- [ ] T017 TrayIcon library implementation in src/ui/tray_icon.cpp
-- [ ] T018 Main application entry point in src/main.cpp
+- [x] T017 TrayIcon library implementation in src/ui/tray_icon.cpp
+- [x] T018 Main application entry point in src/main.cpp
 - [ ] T019 CLI argument parsing in src/cli/argument_parser.cpp
 - [ ] T020 Global hotkey registration (X11/Wayland) in src/lib/global_hotkey.cpp
 
