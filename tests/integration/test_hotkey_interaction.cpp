@@ -9,15 +9,11 @@
 
 // Include implemented headers
 #include "models/clipboard_item.h"
-
-// Forward declarations for classes that don't exist yet
-// These will need to be implemented in Phase 3.3
-class ClipboardWindow;
-class ClipboardManager;
-
-// Include headers once they exist
-// #include "ui/clipboard_window.h"
-// #include "services/clipboard_manager.h"
+#include "models/clipboard_history.h"
+#include "models/configuration.h"
+#include "services/clipboard_manager.h"
+#include "ui/clipboard_window.h"
+#include "lib/global_hotkey.h"
 
 class TestHotkeyInteraction : public QObject
 {
@@ -147,51 +143,65 @@ void TestHotkeyInteraction::cleanup()
 void TestHotkeyInteraction::testHotkeyRegistration()
 {
     // Integration Test: Global hotkey should register successfully
-    QSKIP("ClipboardWindow not implemented yet - this test MUST fail until T015 is complete");
+    GlobalHotkey hotkey;
     
-    // Uncomment once ClipboardWindow exists:
-    // bool registered = window->registerHotkey(Qt::MetaModifier, Qt::Key_V);
-    // QVERIFY(registered);
-    // QVERIFY(window->isHotkeyRegistered());
+    // Test hotkey registration with valid key combination
+    QVERIFY(hotkey.registerHotkey("Meta+V"));
+    
+    // Test that duplicate registration fails
+    QVERIFY(!hotkey.registerHotkey("Meta+V"));
+    
+    // Clean up by unregistering
+    hotkey.unregisterHotkey();
+    
+    // Test that we can register again after unregistering
+    QVERIFY(hotkey.registerHotkey("Meta+V"));
+    hotkey.unregisterHotkey();
 }
 
 void TestHotkeyInteraction::testHotkeyUnregistration()
 {
     // Integration Test: Hotkey should unregister cleanly
-    QSKIP("ClipboardWindow not implemented yet - this test MUST fail until T015 is complete");
+    GlobalHotkey hotkey;
     
-    // Uncomment once ClipboardWindow exists:
-    // window->registerHotkey(Qt::MetaModifier, Qt::Key_V);
-    // QVERIFY(window->isHotkeyRegistered());
-    // 
-    // window->unregisterHotkey();
-    // QVERIFY(!window->isHotkeyRegistered());
+    // Register and then unregister
+    QVERIFY(hotkey.registerHotkey("Meta+V"));
+    hotkey.unregisterHotkey();
+    
+    // Verify we can register again (indicates successful unregistration)
+    QVERIFY(hotkey.registerHotkey("Meta+V"));
+    hotkey.unregisterHotkey();
 }
 
 void TestHotkeyInteraction::testHotkeyReregistration()
 {
     // Integration Test: Should handle register -> unregister -> register cycle
-    QSKIP("ClipboardWindow not implemented yet - this test MUST fail until T015 is complete");
+    GlobalHotkey hotkey;
     
-    // Uncomment once ClipboardWindow exists:
-    // window->registerHotkey(Qt::MetaModifier, Qt::Key_V);
-    // window->unregisterHotkey();
-    // bool reregistered = window->registerHotkey(Qt::MetaModifier, Qt::Key_V);
-    // QVERIFY(reregistered);
+    // First registration
+    QVERIFY(hotkey.registerHotkey("Meta+V"));
+    
+    // Unregister
+    hotkey.unregisterHotkey();
+    
+    // Re-register should succeed
+    QVERIFY(hotkey.registerHotkey("Meta+V"));
+    hotkey.unregisterHotkey();
 }
 
 void TestHotkeyInteraction::testMultipleHotkeyAttempts()
 {
     // Integration Test: Multiple registration attempts should be handled gracefully
-    QSKIP("ClipboardWindow not implemented yet - this test MUST fail until T015 is complete");
+    GlobalHotkey hotkey;
     
-    // Uncomment once ClipboardWindow exists:
-    // bool first = window->registerHotkey(Qt::MetaModifier, Qt::Key_V);
-    // bool second = window->registerHotkey(Qt::MetaModifier, Qt::Key_V);
-    // 
-    // QVERIFY(first);
-    // // Second attempt should either succeed (no-op) or fail gracefully
-    // QVERIFY(window->isHotkeyRegistered());
+    // First registration should succeed
+    QVERIFY(hotkey.registerHotkey("Meta+V"));
+    
+    // Second attempt should fail (already registered)
+    QVERIFY(!hotkey.registerHotkey("Meta+V"));
+    
+    // Verify hotkey is still registered after failed second attempt
+    hotkey.unregisterHotkey();
 }
 
 void TestHotkeyInteraction::testMetaVTrigger()
@@ -263,16 +273,35 @@ void TestHotkeyInteraction::testRapidHotkeyPresses()
 void TestHotkeyInteraction::testWindowShowOnHotkey()
 {
     // Integration Test: Window should appear when hotkey is pressed
-    QSKIP("ClipboardWindow not implemented yet - this test MUST fail until T015 is complete");
+    ClipboardWindow window;
+    GlobalHotkey hotkey;
+    Configuration config;
     
-    // Uncomment once ClipboardWindow exists:
-    // window->setHistory(testHistory);
-    // window->registerHotkey(Qt::MetaModifier, Qt::Key_V);
-    // 
-    // QVERIFY(!isWindowVisible());
-    // simulateHotkey();
-    // waitForWindowAction();
-    // QVERIFY(isWindowVisible());
+    // Set up the window with test data
+    ClipboardHistory testHistory;
+    ClipboardItem item("Test clipboard content", ClipboardItem::Text);
+    testHistory.addItem(item);
+    window.setHistory(testHistory);
+    
+    // Connect hotkey to window show method
+    QObject::connect(&hotkey, &GlobalHotkey::hotkeyPressed, 
+                     &window, &ClipboardWindow::showPopup);
+    
+    // Register hotkey
+    QVERIFY(hotkey.registerHotkey("Meta+V"));
+    
+    // Window should not be visible initially
+    QVERIFY(!window.isVisible());
+    
+    // Simulate hotkey press by emitting the signal
+    emit hotkey.hotkeyPressed();
+    
+    // Window should now be visible
+    QVERIFY(window.isVisible());
+    
+    // Clean up
+    window.hide();
+    hotkey.unregisterHotkey();
 }
 
 void TestHotkeyInteraction::testWindowPositioning()

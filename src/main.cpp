@@ -13,6 +13,7 @@
 #include "ui/clipboard_window.h"
 #include "ui/tray_icon.h"
 #include "models/configuration.h"
+#include "lib/global_hotkey.h"
 
 /**
  * @brief Main application class for Clipboard History Manager
@@ -82,6 +83,7 @@ private:
     std::unique_ptr<ClipboardWindow> m_clipboardWindow;
     std::unique_ptr<TrayIcon> m_trayIcon;
     std::unique_ptr<Configuration> m_configuration;
+    std::unique_ptr<GlobalHotkey> m_globalHotkey;
     
     // Command line options
     QCommandLineParser m_parser;
@@ -289,6 +291,19 @@ bool ClipboardHistoryApp::initializeComponents()
             qWarning() << "System tray not available, running without tray icon";
         }
         
+        // Create GlobalHotkey
+        m_globalHotkey = std::make_unique<GlobalHotkey>();
+        
+        // Register hotkey from configuration
+        QString hotkeyString = m_customHotkey.isEmpty() ? m_configuration->hotkey() : m_customHotkey;
+        if (!m_globalHotkey->registerHotkey(hotkeyString)) {
+            qWarning() << "Failed to register global hotkey:" << hotkeyString 
+                      << "Error:" << m_globalHotkey->lastError();
+            // Continue running without global hotkey
+        } else {
+            qDebug() << "Successfully registered global hotkey:" << hotkeyString;
+        }
+        
         m_componentsInitialized = true;
         return true;
         
@@ -358,6 +373,21 @@ void ClipboardHistoryApp::connectComponents()
                              QClipboard* clipboard = QApplication::clipboard();
                              clipboard->setText(item.text());
                          });
+    }
+    
+    // Connect GlobalHotkey if available
+    if (m_globalHotkey && m_globalHotkey->isRegistered()) {
+        QObject::connect(m_globalHotkey.get(), &GlobalHotkey::hotkeyTriggered,
+                         [this]() {
+                             if (m_verbose) {
+                                 qDebug() << "Global hotkey triggered - showing clipboard window";
+                             }
+                             m_clipboardWindow->showAtCursor();
+                         });
+        
+        if (m_verbose) {
+            qDebug() << "Global hotkey connected:" << m_globalHotkey->getHotkeyString();
+        }
     }
     
     // Start clipboard monitoring

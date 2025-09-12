@@ -72,7 +72,7 @@
 - [x] T022 Wire ClipboardWindow to ClipboardManager signals
 - [x] T023 Integrate TrayIcon with system tray and menu actions
 - [x] T024 JSON persistence for configuration and history
-- [ ] T025 Cross-platform global hotkey registration
+- [x] T025 Cross-platform global hotkey registration
 
 ## Phase 3.5: Polish
 - [ ] T026 [P] Unit tests for ClipboardItem validation in tests/unit/test_clipboard_item.cpp
