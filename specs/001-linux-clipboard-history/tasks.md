@@ -69,7 +69,7 @@
 
 ## Phase 3.4: Integration
 - [x] T021 Connect ClipboardManager to QClipboard monitoring
-- [ ] T022 Wire ClipboardWindow to ClipboardManager signals
+- [x] T022 Wire ClipboardWindow to ClipboardManager signals
 - [ ] T023 Integrate TrayIcon with system tray and menu actions
 - [ ] T024 JSON persistence for configuration and history
 - [ ] T025 Cross-platform global hotkey registration
