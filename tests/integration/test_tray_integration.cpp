@@ -120,14 +120,14 @@ private:
 
 void TestTrayIntegration::initTestCase()
 {
-    // Ensure QApplication exists for system tray
+    Ensure QApplication exists for system tray
     if (!QApplication::instance()) {
         static int argc = 1;
         static char* argv[] = {"test"};
         new QApplication(argc, argv);
     }
     
-    // Skip all tests if system tray is not available
+    Skip all tests if system tray is not available
     if (!QSystemTrayIcon::isSystemTrayAvailable()) {
         QSKIP("System tray not available on this platform");
     }
@@ -138,19 +138,19 @@ void TestTrayIntegration::initTestCase()
 
 void TestTrayIntegration::cleanupTestCase()
 {
-    // Cleanup handled by QApplication destructor
+    Cleanup handled by QApplication destructor
 }
 
 void TestTrayIntegration::init()
 {
-    // Create fresh component instances for each test
+    Create fresh component instances for each test
     createComponents();
     connectComponents();
     
-    // Create test data
+    Create test data
     populateTestHistory(10);
     
-    // Clear clipboard for clean test start
+    Clear clipboard for clean test start
     clipboard->clear();
 }
 
@@ -184,33 +184,28 @@ void TestTrayIntegration::testTrayIconVisibility()
 void TestTrayIntegration::testTrayIconDestruction()
 {
     // Integration Test: Tray icon should be cleanly destroyed
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
+    trayIcon->show();
+    QVERIFY(trayIcon->isVisible());
     
-    // Uncomment once TrayIcon exists:
-    // trayIcon->show();
-    // QVERIFY(trayIcon->isVisible());
-    // 
-    // delete trayIcon;
-    // trayIcon = nullptr;
-    // 
-    // // Should not crash or leave artifacts
+    delete trayIcon;
+    trayIcon = nullptr;
+    
+    // Should not crash or leave artifacts
 }
 
 void TestTrayIntegration::testTrayIconReinitialization()
 {
     // Integration Test: Tray icon should handle recreation correctly
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // trayIcon->show();
-    // delete trayIcon;
-    // 
-    // // Recreate
-    // trayIcon = new TrayIcon(this);
-    // connectComponents();
-    // trayIcon->show();
-    // 
-    // QVERIFY(trayIcon->isVisible());
+    trayIcon->show();
+    delete trayIcon;
+    
+    // Recreate
+    trayIcon = new TrayIcon(this);
+    connectComponents();
+    trayIcon->show();
+    
+    QVERIFY(trayIcon->isVisible());
 }
 
 void TestTrayIntegration::testSystemTrayAvailability()
@@ -229,58 +224,49 @@ void TestTrayIntegration::testSystemTrayAvailability()
 void TestTrayIntegration::testTrayIconThemeAdaptation()
 {
     // Integration Test: Tray icon should adapt to system theme
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
+    QIcon initialIcon = trayIcon->icon();
+    QVERIFY(!initialIcon.isNull());
     
-    // Uncomment once TrayIcon exists:
-    // QIcon initialIcon = trayIcon->icon();
-    // QVERIFY(!initialIcon.isNull());
-    // 
-    // // Test theme change adaptation (if possible to simulate)
-    // trayIcon->setIconTheme("dark");
-    // QIcon darkIcon = trayIcon->icon();
-    // 
-    // trayIcon->setIconTheme("light");
-    // QIcon lightIcon = trayIcon->icon();
-    // 
-    // // Icons should adapt to themes (implementation detail)
-    // QVERIFY(!darkIcon.isNull());
-    // QVERIFY(!lightIcon.isNull());
+    // Test theme change adaptation (if possible to simulate)
+    trayIcon->setIconTheme("dark");
+    QIcon darkIcon = trayIcon->icon();
+    
+    trayIcon->setIconTheme("light");
+    QIcon lightIcon = trayIcon->icon();
+    
+    // Icons should adapt to themes (implementation detail)
+    QVERIFY(!darkIcon.isNull());
+    QVERIFY(!lightIcon.isNull());
 }
 
 void TestTrayIntegration::testTrayIconStatesIntegration()
 {
     // Integration Test: Tray icon should reflect application state
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
+    // Test empty history state
+    trayIcon->updateIconState(false);
+    QIcon emptyIcon = trayIcon->icon();
     
-    // Uncomment once TrayIcon exists:
-    // // Test empty history state
-    // trayIcon->updateIconState(false);
-    // QIcon emptyIcon = trayIcon->icon();
-    // 
-    // // Test populated history state
-    // trayIcon->updateIconState(true);
-    // QIcon populatedIcon = trayIcon->icon();
-    // 
-    // // Icons should be different to indicate state
-    // QVERIFY(!emptyIcon.isNull());
-    // QVERIFY(!populatedIcon.isNull());
+    // Test populated history state
+    trayIcon->updateIconState(true);
+    QIcon populatedIcon = trayIcon->icon();
+    
+    // Icons should be different to indicate state
+    QVERIFY(!emptyIcon.isNull());
+    QVERIFY(!populatedIcon.isNull());
 }
 
 void TestTrayIntegration::testNotificationIntegration()
 {
     // Integration Test: Tray notifications should work with system
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
-    
-    // Uncomment once TrayIcon exists:
-    // if (QSystemTrayIcon::supportsMessages()) {
-    //     QSignalSpy spy(trayIcon, &QSystemTrayIcon::messageClicked);
-    //     
-    //     trayIcon->showMessage("Test", "Integration test notification",
-    //                          QSystemTrayIcon::Information, 1000);
-    //     
-    //     // Notification should be displayed
-    //     // (Automatic verification is difficult for notifications)
-    // }
+    if (QSystemTrayIcon::supportsMessages()) {
+        QSignalSpy spy(trayIcon, &QSystemTrayIcon::messageClicked);
+        
+        trayIcon->showMessage("Test", "Integration test notification",
+                             QSystemTrayIcon::Information, 1000);
+        
+        // Notification should be displayed
+        // (Automatic verification is difficult for notifications)
+    }
 }
 
 void TestTrayIntegration::testContextMenuCreation()
@@ -292,7 +278,7 @@ void TestTrayIntegration::testContextMenuCreation()
     QList<QAction*> actions = menu->actions();
     QVERIFY(actions.size() >= 6); // Show History, Recent Items, Monitoring, Settings, About, Exit
     
-    // Verify expected actions exist
+    Verify expected actions exist
     bool hasShowHistory = false;
     bool hasExit = false;
     
@@ -311,704 +297,625 @@ void TestTrayIntegration::testContextMenuCreation()
 void TestTrayIntegration::testMenuStructureIntegration()
 {
     // Integration Test: Menu structure should match specification
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
+    QMenu* menu = getTrayContextMenu();
+    QList<QAction*> actions = menu->actions();
     
-    // Uncomment once TrayIcon exists:
-    // QMenu* menu = getTrayContextMenu();
-    // QList<QAction*> actions = menu->actions();
-    // 
-    // // Verify menu structure matches specification
-    // // Expected order: Show History, Recent Items, Separator, Monitoring, Separator, Settings, About, Exit
-    // 
-    // bool foundShowHistory = false;
-    // bool foundRecentItems = false;
-    // bool foundMonitoring = false;
-    // bool foundSettings = false;
-    // bool foundAbout = false;
-    // bool foundExit = false;
-    // 
-    // for (QAction* action : actions) {
-    //     QString text = action->text();
-    //     if (text.contains("Show History")) foundShowHistory = true;
-    //     else if (text.contains("Recent")) foundRecentItems = true;
-    //     else if (text.contains("Monitoring")) foundMonitoring = true;
-    //     else if (text.contains("Settings")) foundSettings = true;
-    //     else if (text.contains("About")) foundAbout = true;
-    //     else if (text.contains("Exit")) foundExit = true;
-    // }
-    // 
-    // QVERIFY(foundShowHistory);
-    // QVERIFY(foundMonitoring);
-    // QVERIFY(foundSettings);
-    // QVERIFY(foundAbout);
-    // QVERIFY(foundExit);
+    Verify menu structure matches specification
+    Expected order: Show History, Recent Items, Separator, Monitoring, Separator, Settings, About, Exit
+    
+    bool foundShowHistory = false;
+    bool foundRecentItems = false;
+    bool foundMonitoring = false;
+    bool foundSettings = false;
+    bool foundAbout = false;
+    bool foundExit = false;
+    
+    for (QAction* action : actions) {
+        QString text = action->text();
+        if (text.contains("Show History")) foundShowHistory = true;
+        else if (text.contains("Recent")) foundRecentItems = true;
+        else if (text.contains("Monitoring")) foundMonitoring = true;
+        else if (text.contains("Settings")) foundSettings = true;
+        else if (text.contains("About")) foundAbout = true;
+        else if (text.contains("Exit")) foundExit = true;
+    }
+    
+    QVERIFY(foundShowHistory);
+    QVERIFY(foundMonitoring);
+    QVERIFY(foundSettings);
+    QVERIFY(foundAbout);
+    QVERIFY(foundExit);
 }
 
 void TestTrayIntegration::testMenuUpdateOnHistoryChange()
 {
     // Integration Test: Menu should update when history changes
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
+    Start with empty history
+    trayIcon->updateRecentItems(QList<ClipboardItem>());
     
-    // Uncomment once TrayIcon exists:
-    // // Start with empty history
-    // trayIcon->updateRecentItems(QList<ClipboardItem>());
-    // 
-    // QMenu* menu = getTrayContextMenu();
-    // QList<QAction*> initialActions = getRecentItemsActions();
-    // 
-    // // Add items to history
-    // trayIcon->updateRecentItems(testHistory.mid(0, 3));
-    // 
-    // QList<QAction*> updatedActions = getRecentItemsActions();
-    // 
-    // // Menu should reflect new history
-    // QVERIFY(updatedActions.size() >= initialActions.size());
+    QMenu* menu = getTrayContextMenu();
+    QList<QAction*> initialActions = getRecentItemsActions();
+    
+    Add items to history
+    trayIcon->updateRecentItems(testHistory.mid(0, 3));
+    
+    QList<QAction*> updatedActions = getRecentItemsActions();
+    
+    Menu should reflect new history
+    QVERIFY(updatedActions.size() >= initialActions.size());
 }
 
 void TestTrayIntegration::testRecentItemsMenuDisplay()
 {
     // Integration Test: Recent items should be displayed correctly in menu
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
+    Update with test history
+    trayIcon->updateRecentItems(testHistory.mid(0, 5));
     
-    // Uncomment once TrayIcon exists:
-    // // Update with test history
-    // trayIcon->updateRecentItems(testHistory.mid(0, 5));
-    // 
-    // QList<QAction*> recentActions = getRecentItemsActions();
-    // 
-    // // Should show up to 5 recent items
-    // QVERIFY(recentActions.size() <= 5);
-    // 
-    // // Verify preview text is truncated to 50 characters
-    // for (QAction* action : recentActions) {
-    //     QString text = action->text();
-    //     QVERIFY(text.length() <= 50 + 10); // Allow for ellipsis and formatting
-    // }
+    QList<QAction*> recentActions = getRecentItemsActions();
+    
+    // Should show up to 5 recent items
+    QVERIFY(recentActions.size() <= 5);
+    
+    Verify preview text is truncated to 50 characters
+    for (QAction* action : recentActions) {
+        QString text = action->text();
+        QVERIFY(text.length() <= 50 + 10); // Allow for ellipsis and formatting
+    }
 }
 
 void TestTrayIntegration::testTrayManagerConnection()
 {
     // Integration Test: Tray icon should be connected to clipboard manager
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
+    // Test signal connection
+    QSignalSpy managerSpy(manager, &ClipboardManager::historyUpdated);
+    QSignalSpy traySpy(trayIcon, &TrayIcon::monitoringToggleRequested);
     
-    // Uncomment once TrayIcon exists:
-    // // Test signal connection
-    // QSignalSpy managerSpy(manager, &ClipboardManager::historyUpdated);
-    // QSignalSpy traySpy(trayIcon, &TrayIcon::monitoringToggleRequested);
-    // 
-    // // Trigger manager signal
-    // setClipboardText("Test connection");
-    // waitForTrayUpdate();
-    // 
-    // // Manager should emit signal
-    // QVERIFY(managerSpy.count() >= 1);
-    // 
-    // // Trigger tray signal
-    // trayIcon->toggleMonitoring();
-    // 
-    // // Tray should emit signal
-    // QCOMPARE(traySpy.count(), 1);
+    Trigger manager signal
+    setClipboardText("Test connection");
+    waitForTrayUpdate();
+    
+    Manager should emit signal
+    QVERIFY(managerSpy.count() >= 1);
+    
+    Trigger tray signal
+    trayIcon->toggleMonitoring();
+    
+    Tray should emit signal
+    QCOMPARE(traySpy.count(), 1);
 }
 
 void TestTrayIntegration::testHistoryUpdatesTrayMenu()
 {
     // Integration Test: History changes should update tray menu
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
+    Start with empty history
+    manager->clearHistory();
+    waitForTrayUpdate();
     
-    // Uncomment once TrayIcon exists:
-    // // Start with empty history
-    // manager->clearHistory();
-    // waitForTrayUpdate();
-    // 
-    // QList<QAction*> emptyActions = getRecentItemsActions();
-    // 
-    // // Add items to history through manager
-    // for (int i = 0; i < 3; ++i) {
-    //     setClipboardText(QString("History item %1").arg(i));
-    //     waitForTrayUpdate();
-    // }
-    // 
-    // QList<QAction*> populatedActions = getRecentItemsActions();
-    // 
-    // // Menu should reflect new items
-    // QVERIFY(populatedActions.size() > emptyActions.size());
+    QList<QAction*> emptyActions = getRecentItemsActions();
+    
+    Add items to history through manager
+    for (int i = 0; i < 3; ++i) {
+        setClipboardText(QString("History item %1").arg(i));
+        waitForTrayUpdate();
+    }
+    
+    QList<QAction*> populatedActions = getRecentItemsActions();
+    
+    Menu should reflect new items
+    QVERIFY(populatedActions.size() > emptyActions.size());
 }
 
 void TestTrayIntegration::testMonitoringStateReflection()
 {
     // Integration Test: Tray should reflect monitoring state
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
+    Start monitoring
+    manager->startMonitoring();
+    trayIcon->setMonitoringState(true);
     
-    // Uncomment once TrayIcon exists:
-    // // Start monitoring
-    // manager->startMonitoring();
-    // trayIcon->setMonitoringState(true);
-    // 
-    // QMenu* menu = getTrayContextMenu();
-    // QAction* monitoringAction = nullptr;
-    // 
-    // for (QAction* action : menu->actions()) {
-    //     if (action->text().contains("Monitoring")) {
-    //         monitoringAction = action;
-    //         break;
-    //     }
-    // }
-    // 
-    // QVERIFY(monitoringAction != nullptr);
-    // QVERIFY(monitoringAction->isCheckable());
-    // QVERIFY(monitoringAction->isChecked());
-    // 
-    // // Stop monitoring
-    // manager->stopMonitoring();
-    // trayIcon->setMonitoringState(false);
-    // 
-    // QVERIFY(!monitoringAction->isChecked());
+    QMenu* menu = getTrayContextMenu();
+    QAction* monitoringAction = nullptr;
+    
+    for (QAction* action : menu->actions()) {
+        if (action->text().contains("Monitoring")) {
+            monitoringAction = action;
+            break;
+        }
+    }
+    
+    QVERIFY(monitoringAction != nullptr);
+    QVERIFY(monitoringAction->isCheckable());
+    QVERIFY(monitoringAction->isChecked());
+    
+    Stop monitoring
+    manager->stopMonitoring();
+    trayIcon->setMonitoringState(false);
+    
+    QVERIFY(!monitoringAction->isChecked());
 }
 
 void TestTrayIntegration::testTrayIconStateSync()
 {
     // Integration Test: Tray icon state should sync with application state
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
+    Start with empty history
+    manager->clearHistory();
+    trayIcon->updateIconState(false);
     
-    // Uncomment once TrayIcon exists:
-    // // Start with empty history
-    // manager->clearHistory();
-    // trayIcon->updateIconState(false);
-    // 
-    // QIcon emptyIcon = trayIcon->icon();
-    // 
-    // // Add items to history
-    // setClipboardText("Content for tray sync test");
-    // waitForTrayUpdate();
-    // trayIcon->updateIconState(true);
-    // 
-    // QIcon populatedIcon = trayIcon->icon();
-    // 
-    // // Icons should be different to indicate state
-    // QVERIFY(emptyIcon.cacheKey() != populatedIcon.cacheKey());
+    QIcon emptyIcon = trayIcon->icon();
+    
+    Add items to history
+    setClipboardText("Content for tray sync test");
+    waitForTrayUpdate();
+    trayIcon->updateIconState(true);
+    
+    QIcon populatedIcon = trayIcon->icon();
+    
+    // Icons should be different to indicate state
+    QVERIFY(emptyIcon.cacheKey() != populatedIcon.cacheKey());
 }
 
 void TestTrayIntegration::testTrayWindowInteraction()
 {
     // Integration Test: Tray and window should interact correctly
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
+    QSignalSpy traySignal(trayIcon, &TrayIcon::historyWindowRequested);
+    QSignalSpy windowSignal(window, &ClipboardWindow::windowShown);
     
-    // Uncomment once TrayIcon exists:
-    // QSignalSpy traySignal(trayIcon, &TrayIcon::historyWindowRequested);
-    // QSignalSpy windowSignal(window, &ClipboardWindow::windowShown);
-    // 
-    // // Tray should request window display
-    // trayIcon->showHistoryWindow();
-    // 
-    // QCOMPARE(traySignal.count(), 1);
-    // 
-    // // Window should respond to request
-    // // This would need proper signal connection
-    // if (windowSignal.isValid()) {
-    //     QVERIFY(windowSignal.count() >= 0); // May or may not emit depending on implementation
-    // }
+    Tray should request window display
+    trayIcon->showHistoryWindow();
+    
+    QCOMPARE(traySignal.count(), 1);
+    
+    Window should respond to request
+    This would need proper signal connection
+    if (windowSignal.isValid()) {
+        QVERIFY(windowSignal.count() >= 0); // May or may not emit depending on implementation
+    }
 }
 
 void TestTrayIntegration::testTrayClickShowsWindow()
 {
     // Integration Test: Tray click should show clipboard window
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // QSignalSpy spy(trayIcon, &TrayIcon::historyWindowRequested);
-    // 
-    // // Simulate left click
-    // simulateTrayClick(QSystemTrayIcon::Trigger);
-    // 
-    // QCOMPARE(spy.count(), 1);
+    QSignalSpy spy(trayIcon, &TrayIcon::historyWindowRequested);
+    
+    // Simulate left click
+    simulateTrayClick(QSystemTrayIcon::Trigger);
+    
+    QCOMPARE(spy.count(), 1);
 }
 
 void TestTrayIntegration::testWindowHideUpdatesTray()
 {
     // Integration Test: Window hiding should update tray state if needed
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // // Show window
-    // window->show();
-    // 
-    // // Hide window
-    // window->hide();
-    // 
-    // // Tray should remain visible and functional
-    // QVERIFY(trayIcon->isVisible());
+    // Show window
+    window->show();
+    
+    // Hide window
+    window->hide();
+    
+    // Tray should remain visible and functional
+    QVERIFY(trayIcon->isVisible());
 }
 
 void TestTrayIntegration::testTrayMenuShowHistory()
 {
     // Integration Test: "Show History" menu action should work
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // QSignalSpy spy(trayIcon, &TrayIcon::historyWindowRequested);
-    // 
-    // QMenu* menu = getTrayContextMenu();
-    // QAction* showHistoryAction = nullptr;
-    // 
-    // for (QAction* action : menu->actions()) {
-    //     if (action->text().contains("Show History")) {
-    //         showHistoryAction = action;
-    //         break;
-    //     }
-    // }
-    // 
-    // QVERIFY(showHistoryAction != nullptr);
-    // showHistoryAction->trigger();
-    // 
-    // QCOMPARE(spy.count(), 1);
+    QSignalSpy spy(trayIcon, &TrayIcon::historyWindowRequested);
+    
+    QMenu* menu = getTrayContextMenu();
+    QAction* showHistoryAction = nullptr;
+    
+    for (QAction* action : menu->actions()) {
+        if (action->text().contains("Show History")) {
+            showHistoryAction = action;
+            break;
+        }
+    }
+    
+    QVERIFY(showHistoryAction != nullptr);
+    showHistoryAction->trigger();
+    
+    QCOMPARE(spy.count(), 1);
 }
 
 void TestTrayIntegration::testLeftClickBehavior()
 {
     // Integration Test: Left click should show history window
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // QSignalSpy spy(trayIcon, &TrayIcon::historyWindowRequested);
-    // 
-    // simulateTrayClick(QSystemTrayIcon::Trigger);
-    // 
-    // QCOMPARE(spy.count(), 1);
+    QSignalSpy spy(trayIcon, &TrayIcon::historyWindowRequested);
+    
+    simulateTrayClick(QSystemTrayIcon::Trigger);
+    
+    QCOMPARE(spy.count(), 1);
 }
 
 void TestTrayIntegration::testRightClickBehavior()
 {
     // Integration Test: Right click should show context menu
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // simulateTrayClick(QSystemTrayIcon::Context);
-    // 
-    // QMenu* menu = getTrayContextMenu();
-    // QVERIFY(menu != nullptr);
-    // // Menu visibility is hard to test automatically
+    simulateTrayClick(QSystemTrayIcon::Context);
+    
+    QMenu* menu = getTrayContextMenu();
+    QVERIFY(menu != nullptr);
+    // Menu visibility is hard to test automatically
 }
 
 void TestTrayIntegration::testDoubleClickBehavior()
 {
     // Integration Test: Double click should show history window
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // QSignalSpy spy(trayIcon, &TrayIcon::historyWindowRequested);
-    // 
-    // simulateTrayClick(QSystemTrayIcon::DoubleClick);
-    // 
-    // QCOMPARE(spy.count(), 1);
+    QSignalSpy spy(trayIcon, &TrayIcon::historyWindowRequested);
+    
+    simulateTrayClick(QSystemTrayIcon::DoubleClick);
+    
+    QCOMPARE(spy.count(), 1);
 }
 
 void TestTrayIntegration::testMiddleClickBehavior()
 {
     // Integration Test: Middle click should toggle monitoring
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // QSignalSpy spy(trayIcon, &TrayIcon::monitoringToggleRequested);
-    // 
-    // simulateTrayClick(QSystemTrayIcon::MiddleClick);
-    // 
-    // QCOMPARE(spy.count(), 1);
+    QSignalSpy spy(trayIcon, &TrayIcon::monitoringToggleRequested);
+    
+    simulateTrayClick(QSystemTrayIcon::MiddleClick);
+    
+    QCOMPARE(spy.count(), 1);
 }
 
 void TestTrayIntegration::testRecentItemsDisplay()
 {
     // Integration Test: Recent items should be displayed correctly
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // // Populate with test history
-    // trayIcon->updateRecentItems(testHistory.mid(0, 5));
-    // 
-    // QList<QAction*> recentActions = getRecentItemsActions();
-    // 
-    // // Should show exactly 5 items or less
-    // QVERIFY(recentActions.size() <= 5);
-    // 
-    // // Each action should have appropriate text
-    // for (int i = 0; i < recentActions.size(); ++i) {
-    //     QString actionText = recentActions[i]->text();
-    //     QVERIFY(!actionText.isEmpty());
-    //     QVERIFY(actionText.length() <= 50 + 10); // 50 chars + formatting
-    // }
+    // Populate with test history
+    trayIcon->updateRecentItems(testHistory.mid(0, 5));
+    
+    QList<QAction*> recentActions = getRecentItemsActions();
+    
+    // Should show exactly 5 items or less
+    QVERIFY(recentActions.size() <= 5);
+    
+    // Each action should have appropriate text
+    for (int i = 0; i < recentActions.size(); ++i) {
+        QString actionText = recentActions[i]->text();
+        QVERIFY(!actionText.isEmpty());
+        QVERIFY(actionText.length() <= 50 + 10); // 50 chars + formatting
+    }
 }
 
 void TestTrayIntegration::testRecentItemSelection()
 {
     // Integration Test: Selecting recent item should emit signal
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // trayIcon->updateRecentItems(testHistory.mid(0, 3));
-    // 
-    // QSignalSpy spy(trayIcon, &TrayIcon::recentItemSelected);
-    // 
-    // QList<QAction*> recentActions = getRecentItemsActions();
-    // if (!recentActions.isEmpty()) {
-    //     recentActions.first()->trigger();
-    //     QCOMPARE(spy.count(), 1);
-    // }
+    trayIcon->updateRecentItems(testHistory.mid(0, 3));
+    
+    QSignalSpy spy(trayIcon, &TrayIcon::recentItemSelected);
+    
+    QList<QAction*> recentActions = getRecentItemsActions();
+    if (!recentActions.isEmpty()) {
+        recentActions.first()->trigger();
+        QCOMPARE(spy.count(), 1);
+    }
 }
 
 void TestTrayIntegration::testRecentItemsUpdate()
 {
     // Integration Test: Recent items should update when history changes
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // // Start with initial items
-    // trayIcon->updateRecentItems(testHistory.mid(0, 3));
-    // QList<QAction*> initialActions = getRecentItemsActions();
-    // 
-    // // Update with different items
-    // trayIcon->updateRecentItems(testHistory.mid(3, 3));
-    // QList<QAction*> updatedActions = getRecentItemsActions();
-    // 
-    // // Actions should be different
-    // QCOMPARE(updatedActions.size(), initialActions.size());
-    // 
-    // // Content should be different
-    // if (!initialActions.isEmpty() && !updatedActions.isEmpty()) {
-    //     QVERIFY(initialActions.first()->text() != updatedActions.first()->text());
-    // }
+    // Start with initial items
+    trayIcon->updateRecentItems(testHistory.mid(0, 3));
+    QList<QAction*> initialActions = getRecentItemsActions();
+    
+    // Update with different items
+    trayIcon->updateRecentItems(testHistory.mid(3, 3));
+    QList<QAction*> updatedActions = getRecentItemsActions();
+    
+    // Actions should be different
+    QCOMPARE(updatedActions.size(), initialActions.size());
+    
+    // Content should be different
+    if (!initialActions.isEmpty() && !updatedActions.isEmpty()) {
+        QVERIFY(initialActions.first()->text() != updatedActions.first()->text());
+    }
 }
 
 void TestTrayIntegration::testRecentItemsLimit()
 {
     // Integration Test: Recent items should be limited to 5
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // // Try to update with more than 5 items
-    // trayIcon->updateRecentItems(testHistory); // 10 items
-    // 
-    // QList<QAction*> recentActions = getRecentItemsActions();
-    // 
-    // // Should be limited to 5
-    // QVERIFY(recentActions.size() <= 5);
+    // Try to update with more than 5 items
+    trayIcon->updateRecentItems(testHistory); // 10 items
+    
+    QList<QAction*> recentActions = getRecentItemsActions();
+    
+    // Should be limited to 5
+    QVERIFY(recentActions.size() <= 5);
 }
 
 void TestTrayIntegration::testTrayUpdatePerformance()
 {
     // Integration Test: Tray updates should meet performance requirements
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // QElapsedTimer timer;
-    // timer.start();
-    // 
-    // // Update tray with history
-    // trayIcon->updateRecentItems(testHistory.mid(0, 5));
-    // 
-    // qint64 elapsed = timer.elapsed();
-    // QVERIFY(elapsed < 100); // <100ms requirement for menu updates
+    QElapsedTimer timer;
+    timer.start();
+    
+    // Update tray with history
+    trayIcon->updateRecentItems(testHistory.mid(0, 5));
+    
+    qint64 elapsed = timer.elapsed();
+    QVERIFY(elapsed < 100); // <100ms requirement for menu updates
 }
 
 void TestTrayIntegration::testMenuDisplayPerformance()
 {
     // Integration Test: Menu display should be fast
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // trayIcon->updateRecentItems(testHistory.mid(0, 5));
-    // 
-    // QElapsedTimer timer;
-    // timer.start();
-    // 
-    // QMenu* menu = getTrayContextMenu();
-    // 
-    // qint64 elapsed = timer.elapsed();
-    // QVERIFY(elapsed < 50); // Menu access should be instant
-    // QVERIFY(menu != nullptr);
+    trayIcon->updateRecentItems(testHistory.mid(0, 5));
+    
+    QElapsedTimer timer;
+    timer.start();
+    
+    QMenu* menu = getTrayContextMenu();
+    
+    qint64 elapsed = timer.elapsed();
+    QVERIFY(elapsed < 50); // Menu access should be instant
+    QVERIFY(menu != nullptr);
 }
 
 void TestTrayIntegration::testIconUpdatePerformance()
 {
     // Integration Test: Icon updates should be instant
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // QElapsedTimer timer;
-    // timer.start();
-    // 
-    // trayIcon->updateIconState(true);
-    // 
-    // qint64 elapsed = timer.elapsed();
-    // QVERIFY(elapsed < 50); // <50ms requirement for icon updates
+    QElapsedTimer timer;
+    timer.start();
+    
+    trayIcon->updateIconState(true);
+    
+    qint64 elapsed = timer.elapsed();
+    QVERIFY(elapsed < 50); // <50ms requirement for icon updates
 }
 
 void TestTrayIntegration::testBulkHistoryUpdatePerformance()
 {
     // Integration Test: Bulk history updates should be efficient
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // // Create larger history
-    // QList<ClipboardItem> largeHistory;
-    // for (int i = 0; i < 100; ++i) {
-    //     largeHistory << createTestItem(QString("Bulk item %1").arg(i), i);
-    // }
-    // 
-    // QElapsedTimer timer;
-    // timer.start();
-    // 
-    // // Update with large history (should only show first 5)
-    // trayIcon->updateRecentItems(largeHistory);
-    // 
-    // qint64 elapsed = timer.elapsed();
-    // QVERIFY(elapsed < 100); // Should handle large updates efficiently
-    // 
-    // QList<QAction*> recentActions = getRecentItemsActions();
-    // QVERIFY(recentActions.size() <= 5);
+    // Create larger history
+    QList<ClipboardItem> largeHistory;
+    for (int i = 0; i < 100; ++i) {
+        largeHistory << createTestItem(QString("Bulk item %1").arg(i), i);
+    }
+    
+    QElapsedTimer timer;
+    timer.start();
+    
+    // Update with large history (should only show first 5)
+    trayIcon->updateRecentItems(largeHistory);
+    
+    qint64 elapsed = timer.elapsed();
+    QVERIFY(elapsed < 100); // Should handle large updates efficiently
+    
+    QList<QAction*> recentActions = getRecentItemsActions();
+    QVERIFY(recentActions.size() <= 5);
 }
 
 void TestTrayIntegration::testManagerSignalHandling()
 {
     // Integration Test: Tray should handle manager signals correctly
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // // Connect signals
-    // connect(manager, &ClipboardManager::historyUpdated,
-    //         trayIcon, &TrayIcon::updateRecentItems);
-    // 
-    // QSignalSpy spy(manager, &ClipboardManager::historyUpdated);
-    // 
-    // // Trigger manager signal
-    // setClipboardText("Signal test content");
-    // waitForTrayUpdate();
-    // 
-    // // Manager should emit signal
-    // QVERIFY(spy.count() >= 1);
-    // 
-    // // Tray should have updated (hard to verify automatically)
+    // Connect signals
+    connect(manager, &ClipboardManager::historyUpdated,
+            trayIcon, &TrayIcon::updateRecentItems);
+    
+    QSignalSpy spy(manager, &ClipboardManager::historyUpdated);
+    
+    // Trigger manager signal
+    setClipboardText("Signal test content");
+    waitForTrayUpdate();
+    
+    // Manager should emit signal
+    QVERIFY(spy.count() >= 1);
+    
+    // Tray should have updated (hard to verify automatically)
 }
 
 void TestTrayIntegration::testWindowSignalHandling()
 {
     // Integration Test: Tray should handle window signals correctly
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // // Connect tray to window
-    // connect(trayIcon, &TrayIcon::historyWindowRequested,
-    //         window, &ClipboardWindow::show);
-    // 
-    // QSignalSpy traySignal(trayIcon, &TrayIcon::historyWindowRequested);
-    // 
-    // // Trigger tray signal
-    // trayIcon->showHistoryWindow();
-    // 
-    // QCOMPARE(traySignal.count(), 1);
+    // Connect tray to window
+    connect(trayIcon, &TrayIcon::historyWindowRequested,
+            window, &ClipboardWindow::show);
+    
+    QSignalSpy traySignal(trayIcon, &TrayIcon::historyWindowRequested);
+    
+    // Trigger tray signal
+    trayIcon->showHistoryWindow();
+    
+    QCOMPARE(traySignal.count(), 1);
 }
 
 void TestTrayIntegration::testTraySignalEmission()
 {
     // Integration Test: Tray should emit correct signals
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
+    QSignalSpy historySignal(trayIcon, &TrayIcon::historyWindowRequested);
+    QSignalSpy monitoringSignal(trayIcon, &TrayIcon::monitoringToggleRequested);
+    QSignalSpy settingsSignal(trayIcon, &TrayIcon::settingsRequested);
+    QSignalSpy aboutSignal(trayIcon, &TrayIcon::aboutRequested);
+    QSignalSpy exitSignal(trayIcon, &TrayIcon::exitRequested);
     
-    // Uncomment once TrayIcon exists:
-    // QSignalSpy historySignal(trayIcon, &TrayIcon::historyWindowRequested);
-    // QSignalSpy monitoringSignal(trayIcon, &TrayIcon::monitoringToggleRequested);
-    // QSignalSpy settingsSignal(trayIcon, &TrayIcon::settingsRequested);
-    // QSignalSpy aboutSignal(trayIcon, &TrayIcon::aboutRequested);
-    // QSignalSpy exitSignal(trayIcon, &TrayIcon::exitRequested);
-    // 
-    // // Test each signal
-    // trayIcon->showHistoryWindow();
-    // QCOMPARE(historySignal.count(), 1);
-    // 
-    // trayIcon->toggleMonitoring();
-    // QCOMPARE(monitoringSignal.count(), 1);
-    // 
-    // trayIcon->showSettings();
-    // QCOMPARE(settingsSignal.count(), 1);
-    // 
-    // trayIcon->showAbout();
-    // QCOMPARE(aboutSignal.count(), 1);
-    // 
-    // trayIcon->exitApplication();
-    // QCOMPARE(exitSignal.count(), 1);
+    // Test each signal
+    trayIcon->showHistoryWindow();
+    QCOMPARE(historySignal.count(), 1);
+    
+    trayIcon->toggleMonitoring();
+    QCOMPARE(monitoringSignal.count(), 1);
+    
+    trayIcon->showSettings();
+    QCOMPARE(settingsSignal.count(), 1);
+    
+    trayIcon->showAbout();
+    QCOMPARE(aboutSignal.count(), 1);
+    
+    trayIcon->exitApplication();
+    QCOMPARE(exitSignal.count(), 1);
 }
 
 void TestTrayIntegration::testCrossComponentSignaling()
 {
     // Integration Test: Signals should flow correctly between components
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
+    Set up cross-component connections
+    connect(manager, &ClipboardManager::historyUpdated,
+            trayIcon, &TrayIcon::updateRecentItems);
+    connect(trayIcon, &TrayIcon::historyWindowRequested,
+            window, &ClipboardWindow::show);
     
-    // Uncomment once TrayIcon exists:
-    // // Set up cross-component connections
-    // connect(manager, &ClipboardManager::historyUpdated,
-    //         trayIcon, &TrayIcon::updateRecentItems);
-    // connect(trayIcon, &TrayIcon::historyWindowRequested,
-    //         window, &ClipboardWindow::show);
-    // 
-    // QSignalSpy managerSpy(manager, &ClipboardManager::historyUpdated);
-    // QSignalSpy windowSpy(window, &ClipboardWindow::windowShown);
-    // 
-    // // Trigger manager update
-    // setClipboardText("Cross-component test");
-    // waitForTrayUpdate();
-    // 
-    // // Should propagate through components
-    // QVERIFY(managerSpy.count() >= 1);
-    // 
-    // // Trigger tray action
-    // trayIcon->showHistoryWindow();
-    // 
-    // // Should affect window
-    // if (windowSpy.isValid()) {
-    //     QVERIFY(windowSpy.count() >= 0);
-    // }
+    QSignalSpy managerSpy(manager, &ClipboardManager::historyUpdated);
+    QSignalSpy windowSpy(window, &ClipboardWindow::windowShown);
+    
+    Trigger manager update
+    setClipboardText("Cross-component test");
+    waitForTrayUpdate();
+    
+    // Should propagate through components
+    QVERIFY(managerSpy.count() >= 1);
+    
+    Trigger tray action
+    trayIcon->showHistoryWindow();
+    
+    // Should affect window
+    if (windowSpy.isValid()) {
+        QVERIFY(windowSpy.count() >= 0);
+    }
 }
 
 void TestTrayIntegration::testSystemTrayUnavailable()
 {
     // Integration Test: Handle system tray unavailability gracefully
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
+    This test would need to simulate system tray being unavailable
+    For now, just verify current availability
     
-    // Uncomment once TrayIcon exists:
-    // // This test would need to simulate system tray being unavailable
-    // // For now, just verify current availability
-    // 
-    // bool available = QSystemTrayIcon::isSystemTrayAvailable();
-    // if (!available) {
-    //     // Application should handle gracefully
-    //     QVERIFY(!trayIcon->isVisible());
-    // } else {
-    //     QVERIFY(trayIcon->show());
-    // }
+    bool available = QSystemTrayIcon::isSystemTrayAvailable();
+    if (!available) {
+        // Application should handle gracefully
+        QVERIFY(!trayIcon->isVisible());
+    } else {
+        QVERIFY(trayIcon->show());
+    }
 }
 
 void TestTrayIntegration::testIconLoadFailure()
 {
     // Integration Test: Handle icon loading failures gracefully
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // // Try to set invalid icon
-    // QIcon invalidIcon("non_existent_file.png");
-    // trayIcon->setCustomIcon(invalidIcon);
-    // 
-    // // Should not crash and should have some fallback icon
-    // QIcon currentIcon = trayIcon->icon();
-    // QVERIFY(!currentIcon.isNull()); // Should have fallback
+    // Try to set invalid icon
+    QIcon invalidIcon("non_existent_file.png");
+    trayIcon->setCustomIcon(invalidIcon);
+    
+    // Should not crash and should have some fallback icon
+    QIcon currentIcon = trayIcon->icon();
+    QVERIFY(!currentIcon.isNull()); // Should have fallback
 }
 
 void TestTrayIntegration::testMenuCreationFailure()
 {
     // Integration Test: Handle menu creation failures gracefully
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // // This would test recovery from menu creation issues
-    // // For now, just verify menu exists
-    // QMenu* menu = getTrayContextMenu();
-    // 
-    // if (menu == nullptr) {
-    //     // Should handle gracefully and possibly recreate
-    //     QFAIL("Menu creation failed");
-    // } else {
-    //     QVERIFY(menu->actions().size() > 0);
-    // }
+    // This would test recovery from menu creation issues
+    // For now, just verify menu exists
+    QMenu* menu = getTrayContextMenu();
+    
+    if (menu == nullptr) {
+        // Should handle gracefully and possibly recreate
+        QFAIL("Menu creation failed");
+    } else {
+        QVERIFY(menu->actions().size() > 0);
+    }
 }
 
 void TestTrayIntegration::testSignalConnectionFailures()
 {
     // Integration Test: Handle signal connection failures gracefully
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // // Test connections work
-    // bool connected = connect(trayIcon, &TrayIcon::historyWindowRequested,
-    //                         this, [](){ /* test slot */ });
-    // QVERIFY(connected);
-    // 
-    // // Test with invalid connection
-    // bool invalidConnection = connect(trayIcon, &TrayIcon::historyWindowRequested,
-    //                                 nullptr, nullptr);
-    // QVERIFY(!invalidConnection);
+    // Test connections work
+    bool connected = connect(trayIcon, &TrayIcon::historyWindowRequested,
+                            this, [](){ /* test slot */ });
+    QVERIFY(connected);
+    
+    // Test with invalid connection
+    bool invalidConnection = connect(trayIcon, &TrayIcon::historyWindowRequested,
+                                    nullptr, nullptr);
+    QVERIFY(!invalidConnection);
 }
 
 void TestTrayIntegration::testCompleteWorkflowIntegration()
 {
     // Integration Test: Complete workflow from clipboard to tray display
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // // Set up complete integration
-    // connectComponents();
-    // 
-    // // Start with empty history
-    // manager->clearHistory();
-    // trayIcon->updateRecentItems(QList<ClipboardItem>());
-    // 
-    // // Add content to clipboard
-    // setClipboardText("Complete workflow test");
-    // waitForTrayUpdate();
-    // 
-    // // Should flow: Clipboard -> Manager -> Tray -> Menu
-    // QList<QAction*> recentActions = getRecentItemsActions();
-    // 
-    // // Should have at least one item
-    // QVERIFY(recentActions.size() >= 1);
-    // 
-    // // Click tray to show window
-    // QSignalSpy spy(trayIcon, &TrayIcon::historyWindowRequested);
-    // simulateTrayClick(QSystemTrayIcon::Trigger);
-    // QCOMPARE(spy.count(), 1);
+    // Set up complete integration
+    connectComponents();
+    
+    // Start with empty history
+    manager->clearHistory();
+    trayIcon->updateRecentItems(QList<ClipboardItem>());
+    
+    // Add content to clipboard
+    setClipboardText("Complete workflow test");
+    waitForTrayUpdate();
+    
+    // Should flow: Clipboard -> Manager -> Tray -> Menu
+    QList<QAction*> recentActions = getRecentItemsActions();
+    
+    // Should have at least one item
+    QVERIFY(recentActions.size() >= 1);
+    
+    // Click tray to show window
+    QSignalSpy spy(trayIcon, &TrayIcon::historyWindowRequested);
+    simulateTrayClick(QSystemTrayIcon::Trigger);
+    QCOMPARE(spy.count(), 1);
 }
 
 void TestTrayIntegration::testStartupSequenceIntegration()
 {
     // Integration Test: Startup sequence should initialize all components correctly
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // // Test initialization order
-    // QVERIFY(manager != nullptr);
-    // QVERIFY(window != nullptr);
-    // QVERIFY(trayIcon != nullptr);
-    // 
-    // // Tray should be visible
-    // trayIcon->show();
-    // QVERIFY(trayIcon->isVisible());
-    // 
-    // // Manager should be ready
-    // manager->startMonitoring();
-    // QVERIFY(manager->isMonitoring());
-    // 
-    // // Components should be connected
-    // connectComponents();
+    // Test initialization order
+    QVERIFY(manager != nullptr);
+    QVERIFY(window != nullptr);
+    QVERIFY(trayIcon != nullptr);
+    
+    // Tray should be visible
+    trayIcon->show();
+    QVERIFY(trayIcon->isVisible());
+    
+    // Manager should be ready
+    manager->startMonitoring();
+    QVERIFY(manager->isMonitoring());
+    
+    // Components should be connected
+    connectComponents();
 }
 
 void TestTrayIntegration::testShutdownSequenceIntegration()
 {
     // Integration Test: Shutdown should clean up all components correctly
-    QSKIP("TrayIcon not implemented yet - this test MUST fail until T017 is complete");
     
-    // Uncomment once TrayIcon exists:
-    // // Start with initialized components
-    // trayIcon->show();
-    // manager->startMonitoring();
-    // 
-    // // Shutdown sequence
-    // manager->stopMonitoring();
-    // trayIcon->hide();
-    // 
-    // // Components should be in clean state
-    // QVERIFY(!manager->isMonitoring());
-    // QVERIFY(!trayIcon->isVisible());
+    // Start with initialized components
+    trayIcon->show();
+    manager->startMonitoring();
+    
+    // Shutdown sequence
+    manager->stopMonitoring();
+    trayIcon->hide();
+    
+    // Components should be in clean state
+    QVERIFY(!manager->isMonitoring());
+    QVERIFY(!trayIcon->isVisible());
 }
 
 // Helper method implementations
 void TestTrayIntegration::createComponents()
 {
-    // Create actual components
+    Create actual components
     manager = new ClipboardManager(this);
     window = new ClipboardWindow(this);
     trayIcon = new TrayIcon(this);
@@ -1016,7 +923,7 @@ void TestTrayIntegration::createComponents()
 
 void TestTrayIntegration::connectComponents()
 {
-    // Connect the components as in main.cpp
+    Connect the components as in main.cpp
     connect(manager, &ClipboardManager::historyChanged,
             [this]() {
                 trayIcon->updateRecentItems(manager->getHistory());
@@ -1071,7 +978,7 @@ void TestTrayIntegration::simulateTrayClick(QSystemTrayIcon::ActivationReason re
 
 void TestTrayIntegration::waitForTrayUpdate()
 {
-    // Give time for tray updates to complete
+    Give time for tray updates to complete
     QTest::qWait(100);
 }
 
