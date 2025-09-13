@@ -274,8 +274,19 @@ bool GlobalHotkey::registerX11Hotkey(int modifiers, int key)
     m_platformData->rootWindow = DefaultRootWindow(m_platformData->display);
 #endif
     
-    m_platformData->x11Modifiers = modifiers;
+    // Convert Qt modifiers to X11 modifiers
+    int x11Modifiers = 0;
+    if (modifiers & Qt::ControlModifier) x11Modifiers |= ControlMask;
+    if (modifiers & Qt::AltModifier) x11Modifiers |= Mod1Mask;
+    if (modifiers & Qt::ShiftModifier) x11Modifiers |= ShiftMask;
+    if (modifiers & Qt::MetaModifier) x11Modifiers |= Mod4Mask;  // Super/Windows key
+    
+    m_platformData->x11Modifiers = x11Modifiers;
     m_platformData->x11Keycode = XKeysymToKeycode(m_platformData->display, key);
+    
+    qDebug() << "GlobalHotkey: X11 Debug - Keycode:" << m_platformData->x11Keycode 
+             << "Modifiers:" << x11Modifiers << "Display:" << (void*)m_platformData->display 
+             << "RootWindow:" << m_platformData->rootWindow;
     
     if (m_platformData->x11Keycode == 0) {
         setError("Could not convert key to X11 keycode");
@@ -283,8 +294,7 @@ bool GlobalHotkey::registerX11Hotkey(int modifiers, int key)
     }
     
     // Register the hotkey with X11
-    // Note: This is a simplified implementation
-    // Real implementation would need proper error checking and event handling
+    // Try simple registration first to debug
     int result = XGrabKey(m_platformData->display, 
                          m_platformData->x11Keycode,
                          m_platformData->x11Modifiers,
@@ -293,18 +303,21 @@ bool GlobalHotkey::registerX11Hotkey(int modifiers, int key)
                          GrabModeAsync,
                          GrabModeAsync);
     
-    XSync(m_platformData->display, False);
+    qDebug() << "GlobalHotkey: Simple registration result:" << result;
     
-    if (result == BadAccess) {
+    if (result == Success) {
+        m_platformData->x11Registered = true;
+        return true;
+    } else if (result == BadAccess) {
         setError("Hotkey already in use by another application");
         return false;
-    } else if (result != Success) {
-        setError(QString("X11 XGrabKey failed with code: %1").arg(result));
+    } else {
+        setError(QString("X11 XGrabKey failed with code: %1 (keycode=%2, modifiers=%3)")
+                .arg(result).arg(m_platformData->x11Keycode).arg(m_platformData->x11Modifiers));
         return false;
     }
     
-    m_platformData->x11Registered = true;
-    return true;
+    XSync(m_platformData->display, False);
 #else
     Q_UNUSED(modifiers)
     Q_UNUSED(key)

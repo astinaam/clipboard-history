@@ -6,12 +6,15 @@
 #include <QStandardPaths>
 #include <QDebug>
 #include <QMessageBox>
+#include <QTimer>
 #include <memory>
 
 // Include our components
 #include "services/clipboard_manager.h"
 #include "ui/clipboard_window.h"
 #include "ui/tray_icon.h"
+#include "ui/settings_dialog.h"
+#include "ui/about_dialog.h"
 #include "models/configuration.h"
 #include "lib/global_hotkey.h"
 
@@ -346,7 +349,8 @@ void ClipboardHistoryApp::connectComponents()
         // Show window when tray icon requests it
         QObject::connect(m_trayIcon.get(), &TrayIcon::historyWindowRequested,
                          [this]() {
-                             m_clipboardWindow->showAtCursor();
+                             // Show at center when invoked from tray icon
+                             m_clipboardWindow->showAtCenter();
                          });
         
         // Toggle monitoring (for now, just emit a debug message)
@@ -359,7 +363,64 @@ void ClipboardHistoryApp::connectComponents()
         
         // Exit application
         QObject::connect(m_trayIcon.get(), &TrayIcon::exitRequested,
-                         QApplication::instance(), &QApplication::quit);
+                         [this]() {
+                             if (m_verbose) {
+                                 qDebug() << "Exit requested - shutting down gracefully";
+                             }
+                             // Hide clipboard window first
+                             if (m_clipboardWindow) {
+                                 m_clipboardWindow->hide();
+                             }
+                             // Stop clipboard monitoring
+                             if (m_clipboardManager) {
+                                 m_clipboardManager->stopMonitoring();
+                             }
+                             // Quit application after a brief delay to ensure cleanup
+                             QTimer::singleShot(100, QApplication::instance(), &QApplication::quit);
+                         });
+        
+        // Handle settings request
+        QObject::connect(m_trayIcon.get(), &TrayIcon::settingsRequested,
+                         [this]() {
+                             if (m_verbose) {
+                                 qDebug() << "Settings requested";
+                             }
+                             
+                             // Create and show settings dialog
+                             SettingsDialog* settingsDialog = new SettingsDialog(m_configuration.get(), nullptr);
+                             
+                             // Connect settings applied signal
+                             QObject::connect(settingsDialog, &SettingsDialog::settingsApplied,
+                                            [this]() {
+                                                if (m_verbose) {
+                                                    qDebug() << "Settings applied - updating components";
+                                                }
+                                                // TODO: Update components with new settings
+                                            });
+                             
+                             // Show dialog and handle cleanup
+                             settingsDialog->setAttribute(Qt::WA_DeleteOnClose);
+                             settingsDialog->show();
+                         });
+        
+        // Handle about request
+        QObject::connect(m_trayIcon.get(), &TrayIcon::aboutRequested,
+                         [this]() {
+                             if (m_verbose) {
+                                 qDebug() << "About requested";
+                             }
+                             
+                             // Get current clipboard count
+                             int clipboardCount = 0;
+                             if (m_clipboardManager) {
+                                 clipboardCount = m_clipboardManager->getHistory().size();
+                             }
+                             
+                             // Create and show about dialog
+                             AboutDialog* aboutDialog = new AboutDialog(clipboardCount, nullptr);
+                             aboutDialog->setAttribute(Qt::WA_DeleteOnClose);
+                             aboutDialog->show();
+                         });
         
         // Update tray with current history
         QObject::connect(m_clipboardManager.get(), &ClipboardManager::historyChanged,

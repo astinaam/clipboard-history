@@ -60,6 +60,11 @@ public:
     void showAtPosition(const QPoint& position);
     
     /**
+     * Show window centered on the primary screen
+     */
+    void showAtCenter();
+    
+    /**
      * Hide the window
      * Can be called explicitly or triggered by events
      */

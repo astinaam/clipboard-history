@@ -60,6 +60,47 @@ void ClipboardWindow::showAtPosition(const QPoint& position)
     });
 }
 
+void ClipboardWindow::showAtCenter()
+{
+    // Update window size based on content
+    QSize windowSize = calculateWindowSize();
+    resize(windowSize);
+    
+    // Get primary screen center
+    QScreen* primaryScreen = QApplication::primaryScreen();
+    if (!primaryScreen) {
+        // Fallback to first available screen
+        const QList<QScreen*> screens = QApplication::screens();
+        if (!screens.isEmpty()) {
+            primaryScreen = screens.first();
+        }
+    }
+    
+    if (primaryScreen) {
+        QRect screenGeometry = primaryScreen->availableGeometry();
+        QPoint centerPos = screenGeometry.center() - QPoint(windowSize.width() / 2, windowSize.height() / 2);
+        
+        // Ensure window stays on screen
+        QPoint adjustedPos = adjustPositionForScreen(centerPos);
+        move(adjustedPos);
+    } else {
+        // Ultimate fallback - use fixed position
+        move(100, 100);
+    }
+    
+    // Show window and ensure it gets focus
+    m_ignoreNextFocusOut = true;
+    show();
+    raise();
+    activateWindow();
+    setFocus();
+    
+    // Reset focus ignore flag after a short delay
+    QTimer::singleShot(100, [this]() {
+        m_ignoreNextFocusOut = false;
+    });
+}
+
 void ClipboardWindow::hideWindow()
 {
     hide();
