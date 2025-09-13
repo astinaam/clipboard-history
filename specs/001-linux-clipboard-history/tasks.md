@@ -76,7 +76,7 @@
 
 ## Phase 3.5: Polish
 - [x] T026 [P] Unit tests for ClipboardItem validation in tests/unit/test_clipboard_item.cpp
-- [ ] T027 [P] Performance tests (<50ms response, <10MB memory) in tests/performance/test_performance.cpp
+- [x] T027 [P] Performance tests (<50ms response, <10MB memory) in tests/performance/test_performance.cpp
 - [ ] T028 [P] Update README.md with build and usage instructions
 
 ## Dependencies
