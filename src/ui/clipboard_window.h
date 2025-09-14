@@ -4,6 +4,11 @@
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QScrollArea>
+#include <QFrame>
 #include <QTimer>
 #include <QKeyEvent>
 #include <QMouseEvent>
@@ -13,6 +18,7 @@
 #include <QCursor>
 #include <QApplication>
 #include <QList>
+#include <QGraphicsDropShadowEffect>
 
 #include "../models/clipboard_item.h"
 
@@ -194,6 +200,12 @@ private slots:
 private:
     // UI Components
     QVBoxLayout* m_layout;           ///< Main window layout
+    QFrame* m_headerFrame;           ///< Header section with title and close button
+    QHBoxLayout* m_headerLayout;     ///< Header layout
+    QLabel* m_titleLabel;            ///< Window title label
+    QLabel* m_subtitleLabel;         ///< Window subtitle label  
+    QPushButton* m_closeButton;      ///< Close button
+    QScrollArea* m_scrollArea;       ///< Scroll area for list
     QListWidget* m_listWidget;       ///< List widget for displaying items
     
     // Data
@@ -216,6 +228,16 @@ private:
      * Setup the list widget properties and connections
      */
     void setupListWidget();
+    
+    /**
+     * Setup the header section with title and close button
+     */
+    void setupHeader();
+    
+    /**
+     * Apply modern glass design styling to the window
+     */
+    void applyGlassDesign();
     
     /**
      * Update the list widget with current items

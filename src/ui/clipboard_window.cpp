@@ -6,22 +6,33 @@
 #include <QStyleOption>
 #include <QStyle>
 #include <QDebug>
+#include <QGraphicsDropShadowEffect>
+#include <QGraphicsBlurEffect>
 
 ClipboardWindow::ClipboardWindow(QWidget* parent)
     : QWidget(parent)
     , m_layout(new QVBoxLayout(this))
+    , m_headerFrame(new QFrame(this))
+    , m_headerLayout(new QHBoxLayout(m_headerFrame))
+    , m_titleLabel(new QLabel("Clipboard History", this))
+    , m_subtitleLabel(new QLabel("", this))
+    , m_closeButton(new QPushButton("✕", this))
+    , m_scrollArea(new QScrollArea(this))
     , m_listWidget(new QListWidget(this))
     , m_maxDisplayItems(10)
     , m_itemHeight(30)
     , m_ignoreNextFocusOut(false)
 {
     setupWindow();
+    setupHeader();
     setupListWidget();
+    applyGlassDesign();
     
     // Setup layout
-    m_layout->setContentsMargins(2, 2, 2, 2);
+    m_layout->setContentsMargins(0, 0, 0, 0);
     m_layout->setSpacing(0);
-    m_layout->addWidget(m_listWidget);
+    m_layout->addWidget(m_headerFrame);
+    m_layout->addWidget(m_scrollArea);
     
     setLayout(m_layout);
 }
@@ -110,6 +121,12 @@ void ClipboardWindow::hideWindow()
 void ClipboardWindow::setHistory(const QList<ClipboardItem>& items)
 {
     m_items = items;
+    
+    // Update subtitle with item count
+    QString subtitle = items.isEmpty() ? "No items" : 
+                      QString("%1 item%2").arg(items.size()).arg(items.size() != 1 ? "s" : "");
+    m_subtitleLabel->setText(subtitle);
+    
     updateListWidget();
 }
 
@@ -278,58 +295,190 @@ void ClipboardWindow::setupWindow()
     setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
     setAttribute(Qt::WA_DeleteOnClose, false);
     setAttribute(Qt::WA_ShowWithoutActivating, false);
+    setAttribute(Qt::WA_TranslucentBackground, true);
     
     // Set window properties
     setFocusPolicy(Qt::StrongFocus);
     setMouseTracking(true);
     
-    // Basic styling
-    setStyleSheet(
-        "ClipboardWindow {"
-        "    background-color: white;"
-        "    border: 2px solid #333333;"
-        "    border-radius: 4px;"
-        "}"
-    );
+    // Set fixed size for consistent appearance
+    setFixedSize(400, 500);
+    
+    // Add drop shadow effect
+    QGraphicsDropShadowEffect* shadowEffect = new QGraphicsDropShadowEffect(this);
+    shadowEffect->setBlurRadius(20);
+    shadowEffect->setColor(QColor(0, 0, 0, 100));
+    shadowEffect->setOffset(0, 5);
+    setGraphicsEffect(shadowEffect);
 }
 
 void ClipboardWindow::setupListWidget()
 {
+    // Configure scroll area
+    m_scrollArea->setWidget(m_listWidget);
+    m_scrollArea->setWidgetResizable(true);
+    m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_scrollArea->setFrameStyle(QFrame::NoFrame);
+    
     // Configure list widget
     m_listWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-    m_listWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    m_listWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_listWidget->setAlternatingRowColors(true);
+    m_listWidget->setAlternatingRowColors(false);
     m_listWidget->setWordWrap(true);
     m_listWidget->setTextElideMode(Qt::ElideRight);
+    m_listWidget->setFrameStyle(QFrame::NoFrame);
     
     // Connect signals
     connect(m_listWidget, &QListWidget::itemActivated,
             this, &ClipboardWindow::onItemActivated);
     connect(m_listWidget, &QListWidget::currentItemChanged,
             this, &ClipboardWindow::onSelectionChanged);
+}
+
+void ClipboardWindow::setupHeader()
+{
+    // Configure header frame
+    m_headerFrame->setFixedHeight(60);
+    m_headerFrame->setObjectName("headerFrame");
     
-    // Style the list widget
-    m_listWidget->setStyleSheet(
-        "QListWidget {"
-        "    background-color: white;"
-        "    border: none;"
-        "    outline: none;"
-        "    selection-background-color: #3875d7;"
-        "    selection-color: white;"
-        "}"
-        "QListWidget::item {"
-        "    padding: 4px 8px;"
-        "    border-bottom: 1px solid #e0e0e0;"
-        "}"
-        "QListWidget::item:hover {"
-        "    background-color: #f0f0f0;"
-        "}"
-        "QListWidget::item:selected {"
-        "    background-color: #3875d7;"
-        "    color: white;"
-        "}"
-    );
+    // Configure title label
+    m_titleLabel->setObjectName("titleLabel");
+    m_titleLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    
+    // Configure subtitle label
+    m_subtitleLabel->setObjectName("subtitleLabel");
+    m_subtitleLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    
+    // Configure close button
+    m_closeButton->setObjectName("closeButton");
+    m_closeButton->setFixedSize(30, 30);
+    m_closeButton->setToolTip("Close");
+    connect(m_closeButton, &QPushButton::clicked, this, &ClipboardWindow::hideWindow);
+    
+    // Layout the header
+    QVBoxLayout* titleLayout = new QVBoxLayout();
+    titleLayout->setContentsMargins(0, 0, 0, 0);
+    titleLayout->setSpacing(2);
+    titleLayout->addWidget(m_titleLabel);
+    titleLayout->addWidget(m_subtitleLabel);
+    
+    m_headerLayout->setContentsMargins(15, 10, 15, 10);
+    m_headerLayout->addLayout(titleLayout);
+    m_headerLayout->addStretch();
+    m_headerLayout->addWidget(m_closeButton);
+}
+
+void ClipboardWindow::applyGlassDesign()
+{
+    setStyleSheet(R"(
+        ClipboardWindow {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+        }
+        
+        QFrame#headerFrame {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 12px 12px 0px 0px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        QLabel#titleLabel {
+            color: #2c3e50;
+            font-size: 16px;
+            font-weight: bold;
+            background: transparent;
+            border: none;
+        }
+        
+        QLabel#subtitleLabel {
+            color: #7f8c8d;
+            font-size: 12px;
+            background: transparent;
+            border: none;
+        }
+        
+        QPushButton#closeButton {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            color: #e74c3c;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        QPushButton#closeButton:hover {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid #e74c3c;
+        }
+        
+        QPushButton#closeButton:pressed {
+            background: rgba(231, 76, 60, 0.2);
+        }
+        
+        QScrollArea {
+            background: transparent;
+            border: none;
+            border-radius: 0px 0px 12px 12px;
+        }
+        
+        QListWidget {
+            background: rgba(255, 255, 255, 0.6);
+            border: none;
+            border-radius: 0px 0px 12px 12px;
+            outline: none;
+            selection-background-color: rgba(52, 152, 219, 0.8);
+            selection-color: white;
+            alternate-background-color: rgba(255, 255, 255, 0.3);
+            color: #2c3e50;
+            font-size: 13px;
+            padding: 5px;
+        }
+        
+        QListWidget::item {
+            background: rgba(255, 255, 255, 0.4);
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin: 2px;
+            color: #2c3e50;
+        }
+        
+        QListWidget::item:selected {
+            background: rgba(52, 152, 219, 0.8);
+            color: white;
+        }
+        
+        QListWidget::item:hover {
+            background: rgba(52, 152, 219, 0.3);
+        }
+        
+        QScrollBar:vertical {
+            background: rgba(255, 255, 255, 0.3);
+            width: 12px;
+            border-radius: 6px;
+            margin: 0px;
+        }
+        
+        QScrollBar::handle:vertical {
+            background: rgba(52, 152, 219, 0.6);
+            border-radius: 6px;
+            min-height: 20px;
+        }
+        
+        QScrollBar::handle:vertical:hover {
+            background: rgba(52, 152, 219, 0.8);
+        }
+        
+        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+            height: 0px;
+        }
+        
+        QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+            background: transparent;
+        }
+    )");
 }
 
 void ClipboardWindow::updateListWidget()
