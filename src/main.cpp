@@ -148,6 +148,10 @@ int ClipboardHistoryApp::run(int argc, char* argv[])
         qDebug() << "System tray available:" << QSystemTrayIcon::isSystemTrayAvailable();
     }
     
+    // Prevent application from quitting when dialogs are closed
+    // This is essential for tray applications
+    app.setQuitOnLastWindowClosed(false);
+    
     // Start the event loop
     return app.exec();
 }
