@@ -386,7 +386,7 @@ void ClipboardHistoryApp::connectComponents()
                                  qDebug() << "Settings requested";
                              }
                              
-                             // Create and show settings dialog
+                             // Create and show settings dialog with proper modal behavior
                              SettingsDialog* settingsDialog = new SettingsDialog(m_configuration.get(), nullptr);
                              
                              // Connect settings applied signal
@@ -398,8 +398,9 @@ void ClipboardHistoryApp::connectComponents()
                                                 // TODO: Update components with new settings
                                             });
                              
-                             // Show dialog and handle cleanup
+                             // Show dialog and handle cleanup  
                              settingsDialog->setAttribute(Qt::WA_DeleteOnClose);
+                             settingsDialog->setWindowModality(Qt::ApplicationModal);
                              settingsDialog->show();
                          });
         
@@ -416,9 +417,10 @@ void ClipboardHistoryApp::connectComponents()
                                  clipboardCount = m_clipboardManager->getHistory().size();
                              }
                              
-                             // Create and show about dialog
+                             // Create and show about dialog with proper modal behavior
                              AboutDialog* aboutDialog = new AboutDialog(clipboardCount, nullptr);
                              aboutDialog->setAttribute(Qt::WA_DeleteOnClose);
+                             aboutDialog->setWindowModality(Qt::ApplicationModal);
                              aboutDialog->show();
                          });
         

@@ -67,9 +67,9 @@ private:
     QHBoxLayout* createFooter();
     
     /**
-     * Apply modern styling to dialog
+     * Apply modern glass design styling to dialog
      */
-    void applyModernStyling();
+    void applyGlassDesign();
 
 private:
     int m_clipboardCount;

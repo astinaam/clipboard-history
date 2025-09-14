@@ -4,6 +4,7 @@
 #include <QPixmap>
 #include <QFont>
 #include <QDateTime>
+#include <QGraphicsDropShadowEffect>
 
 AboutDialog::AboutDialog(int clipboardCount, QWidget* parent)
     : QDialog(parent)
@@ -12,13 +13,24 @@ AboutDialog::AboutDialog(int clipboardCount, QWidget* parent)
     , m_mainLayout(nullptr)
 {
     setupUI();
-    applyModernStyling();
+    applyGlassDesign();
     
-    // Set dialog properties
+    // Set dialog properties for glass design
     setWindowTitle("About Clipboard Manager");
     setWindowIcon(QIcon::fromTheme("help-about"));
     setModal(true);
-    setFixedSize(450, 500);
+    setFixedSize(500, 600);
+    
+    // Make window frameless with translucent background for glass effect
+    setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint);
+    setAttribute(Qt::WA_TranslucentBackground, true);
+    
+    // Add drop shadow effect
+    QGraphicsDropShadowEffect* shadowEffect = new QGraphicsDropShadowEffect(this);
+    shadowEffect->setBlurRadius(25);
+    shadowEffect->setColor(QColor(0, 0, 0, 120));
+    shadowEffect->setOffset(0, 8);
+    setGraphicsEffect(shadowEffect);
     
     // Center on screen
     if (QScreen* screen = QApplication::primaryScreen()) {
@@ -35,18 +47,45 @@ AboutDialog::~AboutDialog()
 void AboutDialog::setupUI()
 {
     m_mainLayout = new QVBoxLayout(this);
-    m_mainLayout->setSpacing(20);
-    m_mainLayout->setContentsMargins(30, 30, 30, 30);
+    m_mainLayout->setSpacing(0);
+    m_mainLayout->setContentsMargins(0, 0, 0, 0);
     
-    // Add sections
-    m_mainLayout->addWidget(createHeaderSection());
-    m_mainLayout->addWidget(createInfoSection());
-    m_mainLayout->addWidget(createStatsSection());
+    // Create main container with glass background
+    QWidget* container = new QWidget();
+    container->setObjectName("glassContainer");
+    QVBoxLayout* containerLayout = new QVBoxLayout(container);
+    containerLayout->setSpacing(25);
+    containerLayout->setContentsMargins(40, 30, 40, 30);
     
-    m_mainLayout->addStretch();
+    // Add header with close button
+    QWidget* headerWidget = new QWidget();
+    QHBoxLayout* headerLayout = new QHBoxLayout(headerWidget);
+    headerLayout->setContentsMargins(0, 0, 0, 0);
+    
+    // Add stretch to push close button to the right
+    headerLayout->addStretch();
+    
+    // Close button
+    m_closeButton = new QPushButton("✕");
+    m_closeButton->setObjectName("closeButton");
+    m_closeButton->setFixedSize(35, 35);
+    m_closeButton->setToolTip("Close");
+    connect(m_closeButton, &QPushButton::clicked, this, &AboutDialog::accept);
+    headerLayout->addWidget(m_closeButton);
+    
+    containerLayout->addWidget(headerWidget);
+    
+    // Add sections with proper spacing
+    containerLayout->addWidget(createHeaderSection());
+    containerLayout->addWidget(createInfoSection());
+    containerLayout->addWidget(createStatsSection());
+    
+    containerLayout->addStretch();
     
     // Add footer
-    m_mainLayout->addLayout(createFooter());
+    containerLayout->addLayout(createFooter());
+    
+    m_mainLayout->addWidget(container);
 }
 
 QWidget* AboutDialog::createHeaderSection()
@@ -188,90 +227,111 @@ QHBoxLayout* AboutDialog::createFooter()
     return footer;
 }
 
-void AboutDialog::applyModernStyling()
+void AboutDialog::applyGlassDesign()
 {
     setStyleSheet(R"(
-        QDialog {
-            background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                       stop: 0 palette(window),
-                                       stop: 1 palette(base));
-            border: 1px solid palette(mid);
-            border-radius: 12px;
+        QWidget#glassContainer {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+        }
+        
+        QPushButton#closeButton {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 17px;
+            color: #e74c3c;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        QPushButton#closeButton:hover {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid #e74c3c;
+        }
+        
+        QPushButton#closeButton:pressed {
+            background: rgba(231, 76, 60, 0.2);
         }
         
         #titleLabel {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: bold;
-            color: palette(text);
-            margin: 5px 0;
+            color: #2c3e50;
+            margin: 10px 0;
+            background: transparent;
         }
         
         #versionLabel {
-            font-size: 16px;
-            color: palette(highlight);
+            font-size: 18px;
+            color: #3498db;
             font-weight: 600;
+            background: transparent;
         }
         
         #subtitleLabel {
-            font-size: 14px;
-            color: palette(mid);
-            margin-bottom: 10px;
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
             font-style: italic;
+            background: transparent;
         }
         
         #sectionTitle {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
-            color: palette(text);
-            margin: 5px 0;
+            color: #2c3e50;
+            margin: 8px 0;
+            background: transparent;
         }
         
         #featuresList {
-            font-size: 13px;
-            color: palette(text);
-            line-height: 1.4;
-            padding: 10px;
-            background-color: palette(alternate-base);
-            border-radius: 6px;
-            border-left: 4px solid palette(highlight);
+            font-size: 14px;
+            color: #2c3e50;
+            line-height: 1.6;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+            border: 1px solid rgba(52, 152, 219, 0.3);
         }
         
         #techInfo {
-            font-size: 12px;
-            color: palette(mid);
-            line-height: 1.3;
+            font-size: 13px;
+            color: #7f8c8d;
+            line-height: 1.5;
+            background: transparent;
         }
         
         #statsGrid {
-            background-color: palette(alternate-base);
-            border-radius: 8px;
-            padding: 15px;
-            border: 1px solid palette(mid);
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(52, 152, 219, 0.3);
         }
         
-        #statItem {
-            font-size: 13px;
-            color: palette(text);
-            padding: 3px 0;
-        }
-        
-        QPushButton {
-            background-color: palette(button);
-            border: 2px solid palette(highlight);
-            border-radius: 6px;
-            padding: 10px 20px;
+        #statsLabel {
             font-size: 14px;
+            color: #2c3e50;
+            font-weight: 600;
+            background: transparent;
+        }
+        
+        #statsValue {
+            font-size: 16px;
+            color: #3498db;
             font-weight: bold;
-            color: palette(text);
+            background: transparent;
         }
         
-        QPushButton:hover {
-            background-color: palette(highlight);
-            color: palette(highlighted-text);
+        #footerText {
+            font-size: 12px;
+            color: #95a5a6;
+            background: transparent;
         }
         
-        QPushButton:pressed {
-            background-color: palette(dark);
+        QLabel {
+            background: transparent;
         }
     )");
 }
